@@ -1,0 +1,82 @@
+{
+  "project_info": {
+    "project_number": "178433887233",
+    "project_id": "food-wise-239be",
+    "storage_bucket": "food-wise-239be.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:178433887233:android:29ab1dc1b575b4dd044400",
+        "android_client_info": {
+          "package_name": "com.code-cache-box"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "178433887233-53so9bf76tt3and1epg3mfprmh6fh007.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnYs52E2Rp1z9ZdwP6gbciV1-P7RJ6bKE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "178433887233-53so9bf76tt3and1epg3mfprmh6fh007.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "178433887233-7inao786g4mjh1tg229prjhnokpg31rl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.food-wise"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:178433887233:android:752faaf0e9bba415044400",
+        "android_client_info": {
+          "package_name": "com.example.food_wise"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "178433887233-53so9bf76tt3and1epg3mfprmh6fh007.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDnYs52E2Rp1z9ZdwP6gbciV1-P7RJ6bKE"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "178433887233-53so9bf76tt3and1epg3mfprmh6fh007.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "178433887233-7inao786g4mjh1tg229prjhnokpg31rl.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.food-wise"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
