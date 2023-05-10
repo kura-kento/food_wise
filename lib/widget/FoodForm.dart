@@ -36,7 +36,8 @@ class _FoodFormWidgetState extends State<FoodFormWidget> {
     return Column(
       children: [
         foodListWidget(), //選択中の食材名
-        foodTags('食材名'),// 料理名
+        foodTags(),// 料理名
+        unitTags(),
         selectedFood?.unitKind != null ? volumeTags(selectUnitKind?.name ?? selectedFood?.unitKind.name) : Container(), //　②「量」タ
         SizedBox(height: 50, child: addButton() ,),// 追加ボタン
       ],
@@ -91,23 +92,20 @@ class _FoodFormWidgetState extends State<FoodFormWidget> {
   }
 
   // 料理名
-  Widget foodTags(title) {
+  Widget foodTags() {
     return Container(
       padding: formPadding,
-      child: Row(children: foodChildren(title))
+      child: Row(children: foodChildren())
     );
   }
 
   // 食材名
-  List<Widget> foodChildren(title) {
+  List<Widget> foodChildren() {
     final List<FoodStorage> _foodStrages = [...widget.foodStorages];
 
     _foodStrages.removeWhere((food) { return foodList.any((value) => value.foodName == food.foodName); });
     return [
-      Container(
-        padding: const EdgeInsets.symmetric(vertical: 4),
-        child: Text('$title：'),
-      ),
+      const SizedBox(width: 60, child: Text('食品名：')),
       ...(selectedFood != null ? [selectedFood] : _foodStrages).map((food) {
         return InkWell(
           borderRadius: const BorderRadius.all(Radius.circular(32)),
@@ -149,92 +147,101 @@ class _FoodFormWidgetState extends State<FoodFormWidget> {
     );
   }
 
+  //②単位
+  Widget unitTags() {
+    if (selectedFood?.id == null) {
+      return Container();
+    } else if(selectedFood?.id != 0) {
+      selectUnitKind = selectedFood?.unitKind;
+    }
+print(selectUnitKind);
+    return Container(
+      padding: formPadding,
+      child: Row(
+        children: [
+          const SizedBox(width: 60, child: Text('単位：')),
+          Wrap(
+            runSpacing: 4,
+            spacing: 4,
+            children: [
+              //「単位」が未選択の時、全て表示
+              ...(selectUnitKind != null ? [selectUnitKind] : Unit.values).map((unit) {
+                return InkWell(
+                    borderRadius: const BorderRadius.all(Radius.circular(32)),
+                    onTap: () {
+                      selectUnitKind = (selectUnitKind == null ? unit : null);
+                      setState(() {});
+                    },
+                    child: customAnimatedContainer(
+                      unit?.typeName ?? '',
+                      iconSize: 24.0,
+                      isSelected: selectUnitKind != null,
+                      color: selectedFood?.id != 0 ? Colors.grey : Colors.pink,
+                    )
+                );
+              }).toList()
+            ]),
+        ],
+      ),
+    );   //単位種別
+  }
+
   // ②「量」の選択肢
   Widget volumeTags(String? ecKind) {
     //（食材名が空だと）
     List? tags = UnitMap.volumeMap[ecKind] ?? [];
 
     return Container(
-      width: double.infinity, padding: EdgeInsets.symmetric(horizontal: 12.0),
-      child: Column(
+      width: double.infinity, padding: formPadding,
+      child: Wrap(
+        runSpacing: 4,
+        spacing: 4,
         children: [
-          //単位種別
-          ...(selectedFood?.id == 0 ? [
-            Container(
-              padding: const EdgeInsets.symmetric(vertical: 4),
-              child: Wrap(
-                  runSpacing: 4,
-                  spacing: 4,
-                  children: [
-                    ...(selectUnitKind != null ? [selectUnitKind] : Unit.values).map((unit) {
-                      return InkWell(
-                          borderRadius: const BorderRadius.all(Radius.circular(32)),
-                          onTap: () {
-                            selectUnitKind = (selectUnitKind == null ? unit : null);
-                            //TODO ボタンを光るように
-                            setState(() {});
-                          },
-                          child: customAnimatedContainer(
-                              unit?.typeName ?? '',
-                              iconSize: 24.0,
-                              isSelected: selectUnitKind != null,
-                          )
-                      );
-                    }).toList()
-                  ]),
-            )
-          ] : []),
-          Wrap(
-            runSpacing: 4,
-            spacing: 4,
-            children: [
-              Container(
-                // height:40,
-                padding: const EdgeInsets.symmetric(vertical: 4),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Row(
-                    children: [
-                      const Text('量：'),
-                      customAnimatedContainer(
-                        double.parse(volumeController.text).toMixedFraction().toString().replaceAll(' 0/1', '').replaceAll('0/1', '0'),
-                        isSelected: true,
-                      ),
-                      // ②「量」　入力フォーム
-                      selectVolume == UnitMap.manualVolume ? Expanded(child: volumeName()) : Container(),
-                      ...(double.parse(volumeController.text) != 0 ? [ eraserAltIcon() ] : []
-                      ),
-                    ],
+          Container(
+            // height:40,
+            padding: const EdgeInsets.symmetric(vertical: 4),
+            child: Align(
+              alignment: Alignment.centerLeft,
+              child: Row(
+                children: [
+                  const SizedBox(width: 60, child: Text('量：')),
+                  customAnimatedContainer(
+                    double.parse(volumeController.text).toMixedFraction().toString().replaceAll(' 0/1', '').replaceAll('0/1', '0'),
+                    isSelected: true,
                   ),
-                ),
+                  // ②「量」　入力フォーム
+                  selectVolume == UnitMap.manualVolume ? Expanded(child: volumeName()) : Container(),
+                  ...(double.parse(volumeController.text) != 0 ? [ eraserAltIcon() ] : []
+                  ),
+                ],
               ),
-              ...tags.map((tag) {
-                return InkWell(
-                    borderRadius: const BorderRadius.all(Radius.circular(32)),
-                    onTap: () {
-                      if(tag.volume == null) {
-                        selectVolume = UnitMap.manualVolume;
-                      }
-                      // 選択中と
-                      else if(selectVolume == UnitMap.manualVolume && tag.volume == null) {
-                        selectVolume = null;
-                      } else {
-                        selectVolume = tag;
-                        var _sum = double.parse(volumeController.text);
-                        _sum += tag.volume;
-                        volumeController.text = _sum.toString();
-                      }
-                      //TODO ボタンを光るように
-                      setState(() {});
-                    },
-                    child: customAnimatedContainer(
-                        tag?.name ?? '',
-                        iconSize: 20.0
-                    )
-                );
-              }).toList()
-            ],
+            ),
           ),
+          ...tags.map((tag) {
+            return InkWell(
+                borderRadius: const BorderRadius.all(Radius.circular(32)),
+                onTap: () {
+                  if(tag.volume == null) {
+                    selectVolume = UnitMap.manualVolume;
+                  }
+                  // 選択中と
+                  else if(selectVolume == UnitMap.manualVolume && tag.volume == null) {
+                    selectVolume = null;
+                  } else {
+                    selectVolume = tag;
+                    var _sum = double.parse(volumeController.text);
+                    _sum += tag.volume;
+                    volumeController.text = _sum.toString();
+                  }
+                  //TODO ボタンを光るように
+                  setState(() {});
+                },
+                child: customAnimatedContainer(
+                    tag?.name ?? '',
+                    iconSize: 20.0
+                )
+            );
+          }).toList()
         ],
       ),
     );
@@ -302,6 +309,7 @@ class _FoodFormWidgetState extends State<FoodFormWidget> {
   void selectClear({bool clearAll = false}) {
     if (clearAll) {
       selectedFood = null;
+      selectUnitKind = null;
       selectVolume = null;
       priceController.text = '0';
       volumeController.text = '0';
@@ -309,6 +317,7 @@ class _FoodFormWidgetState extends State<FoodFormWidget> {
     // ①「料理」が未選択
     else if (selectedFood == null) {
       selectVolume = null;
+      selectUnitKind = null;
       priceController.text = '0';
       volumeController.text = '0';
     }
@@ -318,7 +327,7 @@ class _FoodFormWidgetState extends State<FoodFormWidget> {
     }
   }
 
-  Widget customAnimatedContainer(String title, {bool isSelected = false, double iconSize = 24}) {
+  Widget customAnimatedContainer(String title, {bool isSelected = false, double iconSize = 24, Color color = Colors.pink}) {
     return AnimatedContainer(
       duration: const Duration(milliseconds: 200),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -326,22 +335,22 @@ class _FoodFormWidgetState extends State<FoodFormWidget> {
         borderRadius: const BorderRadius.all(Radius.circular(32)),
         border: Border.all(
           width: 2,
-          color: Colors.pink,
+          color: color,
         ),
-        color: isSelected ? Colors.pink : null,
+        color: isSelected ? color : null,
       ),
       child:
       title == '入力'  ?
       Icon(
         Icons.edit,
         size: iconSize,
-        color: isSelected ? Colors.white : Colors.pink,
+        color: isSelected ? Colors.white : color,
       )
           :
       Text(
         title,
         style: TextStyle(
-          color: isSelected ? Colors.white : Colors.pink,
+          color: isSelected ? Colors.white : color,
           fontWeight: FontWeight.bold,
         ),
       ),
