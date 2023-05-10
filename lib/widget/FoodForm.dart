@@ -38,7 +38,7 @@ class _FoodFormWidgetState extends State<FoodFormWidget> {
         foodListWidget(), //選択中の食材名
         foodTags(),// 料理名
         unitTags(),
-        selectedFood?.unitKind != null ? volumeTags(selectUnitKind?.name ?? selectedFood?.unitKind.name) : Container(), //　②「量」タ
+        volumeTags(), //　②「量」
         SizedBox(height: 50, child: addButton() ,),// 追加ボタン
       ],
     );
@@ -187,9 +187,15 @@ print(selectUnitKind);
   }
 
   // ②「量」の選択肢
-  Widget volumeTags(String? ecKind) {
+  Widget volumeTags() {
     //（食材名が空だと）
-    List? tags = UnitMap.volumeMap[ecKind] ?? [];
+    if (selectUnitKind == null) {
+      return Container();
+    }
+
+    print('③量の表示' + selectUnitKind.toString());
+
+    List? tags = UnitMap.volumeMap[selectUnitKind?.name] ?? [];
 
     return Container(
       width: double.infinity, padding: formPadding,
