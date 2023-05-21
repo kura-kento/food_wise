@@ -2,6 +2,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:food_wise/pages/card/form.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
 
@@ -18,10 +19,9 @@ void main() async{
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
-  // runApp(const MyApp());
   runApp(
       RestartWidget(
-          child: MyApp(),
+          child: ProviderScope(child: MyApp()),
       )
   );
 }

@@ -25,6 +25,7 @@ class FoodStorage extends Food {
   @override
   Map<String, dynamic> toMap() {
     final Map<String, dynamic> map = super.toMap();
+    print(map);
     map['id'] = id;
     map['memo'] = memo;
     map['sort'] = sort;

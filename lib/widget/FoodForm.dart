@@ -1,21 +1,32 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:food_wise/common/layout/appbar.dart';
 import 'package:fraction/fraction.dart';
 import 'package:icofont_flutter/icofont_flutter.dart';
+import 'package:riverpod/riverpod.dart';
 import '../enum/Unit.dart';
 import '../model/Food.dart';
 import '../model/FoodStorage.dart';
+import '../pages/input/input.dart';
 
-class FoodFormWidget extends StatefulWidget {
-  FoodFormWidget({Key? key, required this.foodStorages, required this.onButtonPressed}) : super(key: key);
-  List<FoodStorage> foodStorages;
-  final Function(double) onButtonPressed;
+final insertFoodsProvider = StateProvider((ref) => <Food>[]);
+
+class FoodFormWidget extends ConsumerStatefulWidget {
+  const FoodFormWidget({Key? key,
+    required this.foodStorages,
+    required this.onButtonPressed,
+    required this.isFoodStorages,
+  }) : super(key: key);
+  final List<FoodStorage> foodStorages;
+  final Function(dynamic) onButtonPressed;
+  final bool isFoodStorages;
 
   @override
-  State<FoodFormWidget> createState() => _FoodFormWidgetState();
+  FoodFormWidgetState createState() => FoodFormWidgetState();
 }
 
-class _FoodFormWidgetState extends State<FoodFormWidget> {
+class FoodFormWidgetState extends ConsumerState<FoodFormWidget> {
   double padding = 10.0;
   EdgeInsets formPadding = const EdgeInsets.only(top:10.0, left:10.0, right:10.0);
   var focusNode = FocusNode();
@@ -24,15 +35,24 @@ class _FoodFormWidgetState extends State<FoodFormWidget> {
   TextEditingController priceController = TextEditingController(text: '0');
   TextEditingController volumeController = TextEditingController(text: '0');
 
-  List<Food> foodList = [];
   FoodStorage? selectedFood;
   Volume? selectVolume;
   double sumPrice = 0;
 
   Unit? selectUnitKind;
+  late var insertFoods;
+
+  @override
+  void initState() {
+    // TODO: implement initState
+    widget.isFoodStorages ? selectedFood = FoodStorage(0, '入力',Unit.piece, 0, 0, 'null', 0, null, null) : null;
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
+    insertFoods = ref.watch(insertFoodsProvider);
+
     return Column(
       children: [
         foodListWidget(), //選択中の食材名
@@ -44,9 +64,9 @@ class _FoodFormWidgetState extends State<FoodFormWidget> {
     );
   }
 
-  // 選択中の一覧
+  // ④選択中の一覧
   Widget foodListWidget() {
-    if(foodList.isEmpty) {
+    if(insertFoods.isEmpty) {
       return Container();
     }
 
@@ -54,9 +74,9 @@ class _FoodFormWidgetState extends State<FoodFormWidget> {
       padding: formPadding,
       child: ListView.builder(
         shrinkWrap: true,
-        itemCount: foodList.length,
+        itemCount: insertFoods.length,
         itemBuilder: (BuildContext context, int index) {
-          Food _food = foodList[index];
+          Food _food = insertFoods[index];
           return Row(
             children: [
               Expanded(flex: 2, child: Text(_food.foodName, overflow: TextOverflow.ellipsis)),
@@ -77,7 +97,7 @@ class _FoodFormWidgetState extends State<FoodFormWidget> {
                 child: IconButton(
                   padding: EdgeInsets.zero,
                   onPressed: () {
-                    foodList.removeAt(index);
+                    insertFoods.removeAt(index);
                     priceSum();
                     setState(() {});
                   },
@@ -93,24 +113,41 @@ class _FoodFormWidgetState extends State<FoodFormWidget> {
 
   // 料理名
   Widget foodTags() {
+    if(selectedFood?.id == 0 || widget.isFoodStorages) {
+      return Container(
+          padding: formPadding,
+          child: Row(children: foodChildren())
+      );
+    }
+
     return Container(
+      width: double.infinity,
       padding: formPadding,
-      child: Row(children: foodChildren())
+      child: Wrap(
+          runSpacing: 4,
+          spacing: 4,
+          children: foodChildren(),
+      ),
     );
   }
 
   // 食材名
   List<Widget> foodChildren() {
     final List<FoodStorage> _foodStrages = [...widget.foodStorages];
+    //既に選択している食材は除外
+    _foodStrages.removeWhere((food) { return insertFoods.any((value) => value.foodName == food.foodName); });
 
-    _foodStrages.removeWhere((food) { return foodList.any((value) => value.foodName == food.foodName); });
-    return [
-      const SizedBox(width: 60, child: Text('食品名：')),
-      ...(selectedFood != null ? [selectedFood] : _foodStrages).map((food) {
+    List<Widget> result = [const SizedBox(width: 60, child: Text('食品名：')),];
+
+    //　選択中
+    List<FoodStorage?> _foodList = selectedFood != null ? [selectedFood] : _foodStrages;
+
+    result.addAll(
+      _foodList.map((food) {
         return InkWell(
           borderRadius: const BorderRadius.all(Radius.circular(32)),
           onTap: () {
-            if(selectedFood?.id == food?.id) {
+            if(selectedFood?.id == food?.id && widget.isFoodStorages == false) {
               selectedFood = null;
             } else {
               selectedFood = food;
@@ -124,9 +161,13 @@ class _FoodFormWidgetState extends State<FoodFormWidget> {
           ),
         );
       }).toList(),
-      // 食材名入力フォーム
-      ...((selectedFood?.id == 0 || _foodStrages.isEmpty) ? [Expanded(child: foodName())] : []),
-    ];
+    );
+
+    // ①「入力」の場合
+    if(selectedFood?.id == 0) {
+      result.add(Expanded(child: foodName()));
+    }
+    return result;
   }
 
   Widget foodName() {
@@ -154,7 +195,7 @@ class _FoodFormWidgetState extends State<FoodFormWidget> {
     } else if(selectedFood?.id != 0) {
       selectUnitKind = selectedFood?.unitKind;
     }
-print(selectUnitKind);
+    print(selectUnitKind);
     return Container(
       padding: formPadding,
       child: Row(
@@ -204,7 +245,6 @@ print(selectUnitKind);
         spacing: 4,
         children: [
           Container(
-            // height:40,
             padding: const EdgeInsets.symmetric(vertical: 4),
             child: Align(
               alignment: Alignment.centerLeft,
@@ -278,7 +318,7 @@ print(selectUnitKind);
       child: TextField(
         controller: volumeController,
         decoration: InputDecoration(
-          labelText: '食材名',
+          labelText: '金額',
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(5.0),
           ),
@@ -295,7 +335,7 @@ print(selectUnitKind);
     IconButton(
       icon: const Icon(Icons.add, color: Colors.pink,size: 30),
       onPressed: () {
-        foodList.add(
+        insertFoods.add(
             Food(
               selectedFood?.id == 0 ? foodNameController.text : selectedFood?.foodName ?? '', // 名前
               selectedFood?.unitKind ?? Unit.ml, // 単位？
@@ -305,7 +345,7 @@ print(selectUnitKind);
         );
         // init();
         selectClear(clearAll: true);
-        priceSum();
+        // priceSum();
         setState(() {});
       },
     );
@@ -314,7 +354,10 @@ print(selectUnitKind);
   // 現在の条件によって選択をクリアする
   void selectClear({bool clearAll = false}) {
     if (clearAll) {
-      selectedFood = null;
+      if(widget.isFoodStorages == false) {
+        selectedFood = null;
+      }
+
       selectUnitKind = null;
       selectVolume = null;
       priceController.text = '0';
@@ -365,7 +408,7 @@ print(selectUnitKind);
 
   void priceSum() {
     sumPrice = 0;
-    for (var food in foodList) { sumPrice += food.price; }
+    for (var food in insertFoods) { sumPrice += food.price; }
     widget.onButtonPressed(sumPrice);
   }
 

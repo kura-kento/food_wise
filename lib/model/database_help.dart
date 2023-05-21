@@ -3,6 +3,7 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import '../enum/Unit.dart';
+import 'Food.dart';
 import 'FoodStorage.dart';
 import 'FoodTable.dart';
 
@@ -66,6 +67,7 @@ class DatabaseHelper {
     await db.insert(storageTable, FoodStorage(null, '鶏肉', Unit.g, 2000, 2000, 'メモ', 1 , DateTime.now(), null).toMap());
     await db.insert(storageTable, FoodStorage(null, '酒', Unit.ml, 1000, 180, 'メモ', 1 , DateTime.now(), null).toMap());
     await db.insert(storageTable, FoodStorage(null, '醤油', Unit.ml, 1000, 250, 'メモ', 1 , DateTime.now(), null).toMap());
+    await db.insert(storageTable, FoodStorage(null, 'もやし', Unit.g, 200, 40, 'メモ', 1 , DateTime.now(), null).toMap());
 
     // //カードテーブル作成
     // await db.execute('CREATE TABLE $cardTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colListId INTEGER, $colFrontPath TEXT, $colBackPath TEXT, $colCardSort INTEGER, $colCreatedAt TEXT, $colDeletedAt TEXT)');
@@ -76,14 +78,33 @@ class DatabaseHelper {
   // 全て取得
   Future<List<FoodStorage>> getFoodStorage() async {
     final result = await database.query(storageTable, orderBy: '$colCreatedAt DESC');
-    // debugPrint(result.toString());
+    debugPrint(result.toString());
     return result.map((Map<String, dynamic> food) => FoodStorage.fromMapObject(food)).toList();
   }
 
-  Future<void> insertStorage(FoodStorage storage) async {
-    await database.insert(storageTable, storage.toMap());
+
+  /*
+  * 【INSERT】 食糧庫 リストを全て登録
+   */
+  Future<void> insertStorage(List<Food> foods) async {
+    // await DatabaseHelper().insertStorage(card);
     database.transaction((txn) async {
-      final result =  await txn.insert(storageTable, storage.toMap());// debugPrint('インサート時：$result');
+      foods.forEach((food) async {
+        final storage = FoodStorage(
+          null,
+          food.foodName, //食品名前
+          food.unitKind, //単位
+          food.quantity, //数量
+          food.price, //金額
+          null,
+          1,
+          DateTime.now(),
+          null
+        );
+        await txn.insert(storageTable, storage.toMap());
+      });
+      // final result =  await txn.insert(storageTable, storageList.toMap()); // debugPrint('インサート時：$result');
+      // await txn.insert(storageTable, storage.toMap());
       // var cardMap = card.toMap(); //IDをカードカードリストに反映
       // cardMap['list_id'] = result;
       // await await txn.insert(cardTable, cardMap);

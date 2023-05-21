@@ -49,6 +49,8 @@ dependencies:
 #  google_mlkit_image_labeling: ^0.6.0
 #  cloud_firestore: ^4.5.3
   camera: ^0.10.5
+#  riverpod: ^2.3.6
+  flutter_riverpod: ^2.3.6
 #  camera_platform_interface: ^2.5.
 
 dev_dependencies:
