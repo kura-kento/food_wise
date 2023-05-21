@@ -22,31 +22,31 @@ class CustomAppBar extends StatefulWidget {
 class _CustomAppBarState extends State<CustomAppBar> {
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: widget.onTap ?? () => {},
-      child: Container(
-        height: App.appbar_height,
-        color:  App.primary_color,
-        child: Row(
-          children: <Widget>[
-            Expanded(
-              flex: 1,
-              child: widget.leftButton
-                  ??
-              Container()
+    return Container(
+      height: App.appbar_height,
+      color:  App.primary_color,
+      child: Row(
+        children: <Widget>[
+          Expanded(
+            flex: 1,
+            child: widget.leftButton
+                ??
+            Container()
+          ),
+          Expanded(
+            flex: 5,
+            child: InkWell(
+                child: Center(child: App.title(widget.title ?? ''),),
+                onTap: widget.onTap ?? () => {},
             ),
-            Expanded(
-              flex: 5,
-              child: Center(child: App.title(widget.title ?? ''),),
-            ),
-            Expanded(
-              flex: 1,
-              child: widget.rightButton
-                  ??
-              Container()
-            ),
-          ],
-        ),
+          ),
+          Expanded(
+            flex: 1,
+            child: widget.rightButton
+                ??
+            Container()
+          ),
+        ],
       ),
     );
   }

@@ -46,7 +46,7 @@
 		</data>
 		<key>Frameworks/App.framework/App</key>
 		<data>
-		Tp2cpibd364ZanVBEMMIknHDGGQ=
+		Z/4s3MIXHWln5ARF08TQ+fPJQqU=
 		</data>
 		<key>Frameworks/App.framework/Info.plist</key>
 		<data>
@@ -54,7 +54,7 @@
 		</data>
 		<key>Frameworks/App.framework/_CodeSignature/CodeResources</key>
 		<data>
-		y6g+EuYzIqXKHagD+eUmlVEsP2M=
+		8TZU6EQni5aGNTECl73kwLcEhjE=
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/AssetManifest.json</key>
 		<data>
@@ -78,7 +78,7 @@
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/kernel_blob.bin</key>
 		<data>
-		/T+kLpw8PhyDRFJvO9BXM83AnMk=
+		VjNJrrH6KPkIhzvQ71onua/gZxc=
 		</data>
 		<key>Frameworks/App.framework/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>
 		<data>
@@ -186,7 +186,7 @@
 		</data>
 		<key>Frameworks/FirebaseCoreInternal.framework/FirebaseCoreInternal</key>
 		<data>
-		xg2aRTg830ETdL9JR6dWKIhnUfM=
+		CEM2FnobdWkZiaZF9ZCyNocrm38=
 		</data>
 		<key>Frameworks/FirebaseCoreInternal.framework/Info.plist</key>
 		<data>
@@ -987,7 +987,7 @@
 		</data>
 		<key>Info.plist</key>
 		<data>
-		yU0dBjObRXF5gLf6XeyalDfxUAQ=
+		0KNEbVFMylhbqgqv75BNpimcGwc=
 		</data>
 		<key>LatinOCRResources.bundle/Info.plist</key>
 		<data>
@@ -1258,7 +1258,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			ZhgsQ7NHnh0E3GLkTU16UKYZzRiua+S2DEkbkFaEeuc=
+			lZ24wBk6Xw/WSVP5Tuty0FSBWac1f7KjOjH/waHEKkw=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/Info.plist</key>
@@ -1272,7 +1272,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			hyKs7vFeikSPh/2w/YNJCsH6yQ3OxwF7QW1j/AUBoBs=
+			x7gttw/NhQ6fHRmfWYtIhq+cPlD3qRJM224Ei9KL1P4=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/flutter_assets/AssetManifest.json</key>
@@ -1314,7 +1314,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			XreEZb3q+uzYqJH8x3NCxVXbAjoPo2yQHp5HDXUdnKs=
+			psaNksXVxJEIxtI6pfMsyzaPF8UgW4cs33IIIvnkTz8=
 			</data>
 		</dict>
 		<key>Frameworks/App.framework/flutter_assets/packages/cupertino_icons/assets/CupertinoIcons.ttf</key>
@@ -1503,7 +1503,7 @@
 		<dict>
 			<key>hash2</key>
 			<data>
-			9fjpu6xV+cR89hDgnOGiZcYFmTnLpdzeKZaDySHjARw=
+			JcJia5ZG1sK+MWBlEOztbnbqcDhH+Q+ttWKfDxkV9l8=
 			</data>
 		</dict>
 		<key>Frameworks/FirebaseCoreInternal.framework/Info.plist</key>

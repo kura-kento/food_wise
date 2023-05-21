@@ -3,9 +3,11 @@ import 'package:intl/intl.dart';
 import '../enum/Unit.dart';
 import 'Food.dart';
 
-class FoodTable extends Food {
-  FoodTable(
-      this.foodStorageId,
+// 使用済みの食料　料理との紐付け
+class UsedFood extends Food {
+  UsedFood(
+      this.id,
+      this.foodStorageId,//食糧庫から量を減らすため
       String foodName,
       Unit unitKind,
       double quantity,
@@ -38,7 +40,7 @@ class FoodTable extends Food {
   }
 
   @override
-  FoodTable.fromMapObject(Map<String, dynamic> map): super.fromMapObject(map) {
+  UsedFood.fromMapObject(Map<String, dynamic> map): super.fromMapObject(map) {
     // print(map['deleted_at']);
     id = map['id'];
     foodStorageId = map['food_storage_id'];
