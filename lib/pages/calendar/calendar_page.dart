@@ -11,6 +11,12 @@ import '../../common/app.dart';
 import '../../common/shared_prefs.dart';
 import '../../common/utils.dart';
 
+class Day {
+  Day(this.name, this.color);
+  String name;
+  Color color;
+}
+
 class CalendarPage extends StatefulWidget {
   const CalendarPage({Key? key}) : super(key: key);
   @override
@@ -34,15 +40,15 @@ class _CalendarPageState extends State<CalendarPage> {
   // int _realIndex= 1000000000;
 
   bool isLoading = true;
-
-  final List<String> _week = ['日', '月', '火', '水', '木', '金', '土'];
-  final _weekColor = [Colors.red[200],
-    Colors.grey[300],
-    Colors.grey[300],
-    Colors.grey[300],
-    Colors.grey[300],
-    Colors.grey[300],
-    Colors.blue[200]];
+  List<Day> week = [
+    Day('日', Colors.red[200]!),
+    Day('月', Colors.grey[300]!),
+    Day('火', Colors.grey[300]!),
+    Day('水', Colors.grey[300]!),
+    Day('木', Colors.grey[300]!),
+    Day('金', Colors.grey[300]!),
+    Day('土', Colors.blue[200]!),
+  ];
 
   @override
   void initState() {
@@ -120,7 +126,7 @@ class _CalendarPageState extends State<CalendarPage> {
                   children: <Widget>[
                     CustomAppBar(
                       title: 'タイトル',
-                      leftButton: IconButton(
+                      rightButton: IconButton(
                         onPressed: () async {
                           // await Navigator.of(context).push(
                           //   MaterialPageRoute(
@@ -133,15 +139,16 @@ class _CalendarPageState extends State<CalendarPage> {
                           // dataUpdate();
                           // reviewCount();
                         },
-                        icon: const Icon(Icons.add),
+                        icon: const Icon(Icons.add, color: Colors.white,),
                       ),
                     ),
                     Expanded(
                       child: Column(
                         children: <Widget>[
                           //曜日用に1行作る。
-                          Row(children: weekList(),),
-                          Column( children: memoList())
+                          weekWidget(),
+                          ...dayList(),
+                          ...memoList(),
                         ],
                       )
                     ),
@@ -249,47 +256,46 @@ class _CalendarPageState extends State<CalendarPage> {
   // }
 
   //カレンダーの曜日部分（1行目）
-  List<Widget> weekList() {
-    final _list = <Widget>[];
-    for (var i = 0; i < 7; i++) {
-      _list.add(
+  Widget weekWidget() {
+    final result = <Widget>[];
+    for (var day in week) {
+      result.add(
         Expanded(
           flex: 1,
           child: Container(
             alignment: Alignment.center,
-            color: App.weekColor[i],
-            child: Text(App.week[i]),
+            color: day.color,
+            child: Text(day.name),
           ),
         ),
       );
     }
-    return _list;
+    return Row(children: result);
   }
+  
 //カレンダーの日付部分（2行目以降）
   List<Widget> dayList() {
-    final _list = <Widget>[];
+    final resultWeekList = <Widget>[];
     for (var j = 0; j < 6; j++) {
-      final _listCache = <Widget>[];
-      for (var i = 0; i < 7; i++) {
-        _listCache.add(
-          Expanded(
-            flex: 1,
-            child: calendarSquare(calendarDay(i, j)),
-          ),
+      final resultWeek = <Widget>[];
+      for (var i = 0; i < week.length; i++) {
+        resultWeek.add(
+          Expanded( flex: 1, child: calendarSquare(calendarDay(i, j)),),
         );
       }
-      _list.add(Row(children: _listCache));
+      resultWeekList.add(Row(children: resultWeek));
       //土曜日の月が選択月でない　または、月末の場合は終わる。
-      if (Utils.toInt(calendarDay(6, j).month) != selectOfMonth(selectMonthValue).month ||
-          endOfMonth() == Utils.toInt(calendarDay(6, j).day)) {
+      if (Utils.toInt(calendarDay(6, j).month) != selectOfMonth(selectMonthValue).month
+          || endOfMonth() == Utils.toInt(calendarDay(6, j).day)) {
         break;
       }
     }
-    return _list;
+    return resultWeekList;
   }
+
 //カレンダー１日のマス（その月以外は空白にする）
-  Widget calendarSquare(DateTime date){
-    if(date.month == selectOfMonth(selectMonthValue).month){
+  Widget calendarSquare(DateTime date) {
+    if(date.month == selectOfMonth(selectMonthValue).month) {
       return Container(
         color: Colors.grey[100],
         height: 50.0,
@@ -362,13 +368,39 @@ class _CalendarPageState extends State<CalendarPage> {
       );
     }
   }
+
+  //１日のマスの中身
+  List<Widget> squareValue(DateTime date) {
+    final resultWeekList = <Widget>[Expanded(flex: 1, child: Container())];
+    for(var i =0; i<2; i++){
+      resultWeekList.add(
+        Expanded(
+            flex: 1,
+            child: Container(
+                child: Align(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                      moneyOfDay(i,date),
+                      style: TextStyle(
+                        // color: i == 0 ? App.plusColor:App.minusColor
+                      ),
+                      maxLines: 1,
+                    )
+                )
+            )
+        ),
+      );
+    }
+    return resultWeekList;
+  }
+
   //一日のリスト（カレンダー下）
   List<Widget> memoList() {
-    final _list = <Widget>[];
+    final resultWeekList = <Widget>[];
     var calendarList = [];
     for(var i = 0; i < calendarList.length ; i++) {
       if(DateFormat.yMMMd().format(calendarList[i].date) == DateFormat.yMMMd().format(selectDay)) {
-        _list.add(
+        resultWeekList.add(
           InkWell(
             child: Container(
               height: 40,
@@ -422,7 +454,7 @@ class _CalendarPageState extends State<CalendarPage> {
         );
       }
     }
-    return _list;
+    return resultWeekList;
   }
 
   Future<void> updateListView(DateTime month) async {
@@ -446,31 +478,6 @@ class _CalendarPageState extends State<CalendarPage> {
     // print(selectMonthDate);
     // print(monthMap);
     // setState(() {});
-  }
-
-  //１日のマスの中身
-  List<Widget> squareValue(DateTime date) {
-    final _list = <Widget>[Expanded(flex: 1, child: Container())];
-    for(var i =0; i<2; i++){
-      _list.add(
-        Expanded(
-            flex: 1,
-            child: Container(
-                child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      moneyOfDay(i,date),
-                      style: TextStyle(
-                          // color: i == 0 ? App.plusColor:App.minusColor
-                      ),
-                      maxLines: 1,
-                    )
-                )
-            )
-        ),
-      );
-    }
-    return _list;
   }
 //カレンダー表示している日の合計
   String moneyOfDay(int _index, DateTime date) {
