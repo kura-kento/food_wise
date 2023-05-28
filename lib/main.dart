@@ -3,9 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:food_wise/pages/card/form.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
-
 import 'bottom_navigation.dart';
 import 'common/Custom_There.dart';
 import 'common/pass_lock.dart';
@@ -27,12 +25,12 @@ void main() async{
 }
 
 class MyApp extends StatelessWidget {
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       // initialRoute: '/',
       routes: <String, WidgetBuilder> {
-        '/card_form': (BuildContext context) => CardForm(),
         '/pass': (BuildContext context) => const PassLock(),
       },
       debugShowCheckedModeBanner: false,
