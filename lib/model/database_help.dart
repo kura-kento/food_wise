@@ -3,9 +3,10 @@ import 'package:sqflite/sqflite.dart';
 import 'dart:async';
 import 'package:path_provider/path_provider.dart';
 import '../enum/Unit.dart';
+import 'Dish.dart';
 import 'Food.dart';
 import 'FoodStorage.dart';
-import 'FoodTable.dart';
+import 'UsedFoodTable.dart';
 
 class DatabaseHelper {
 
@@ -20,10 +21,15 @@ class DatabaseHelper {
   static String colPrice = 'price';
 
   // 料理
-  static String cardTable = 'cards';
-  static String colListId = 'list_id';
-  static String colFrontPath = 'frontPath';
-  static String colBackPath = 'backPath';
+  static String dishTable = 'dishes';
+  static String dishName = 'dish_name';
+  static String isFavorite = 'is_favorite';
+
+  // 使用済　食材
+  static String usedFoodTable = 'used_foods';
+  static String dishId = 'dish_id';
+  static String foodStorageId = 'food_storage_id';
+
   //カテゴリー
   static String tableName3 = 'tags';
   // this.id,
@@ -69,33 +75,35 @@ class DatabaseHelper {
     await db.insert(storageTable, FoodStorage(null, '醤油', Unit.ml, 1000, 250, 'メモ', 1 , DateTime.now(), null).toMap());
     await db.insert(storageTable, FoodStorage(null, 'もやし', Unit.g, 200, 40, 'メモ', 1 , DateTime.now(), null).toMap());
 
-    // //カードテーブル作成
-    // await db.execute('CREATE TABLE $cardTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $colListId INTEGER, $colFrontPath TEXT, $colBackPath TEXT, $colCardSort INTEGER, $colCreatedAt TEXT, $colDeletedAt TEXT)');
-    // await db.insert(cardTable, CreditCard(1, null, null, 1 , DateTime.now(), null).toMap());
-    //カテゴリー
+    // 料理テーブル
+    await db.execute('CREATE TABLE $dishTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $dishName TEXT, $colMemo TEXT, $colSort INTEGER, $colCreatedAt TEXT, $colDeletedAt TEXT)');
+
+    // 使用済　食材テーブル
+    await db.execute('CREATE TABLE $usedFoodTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $dishId INTEGER, $foodStorageId INTEGER, $colFoodName TEXT, $colUnitKind TEXT, $colQuantity REAL, $colPrice REAL, $colMemo TEXT, $colSort INTEGER, $colCreatedAt TEXT, $colDeletedAt TEXT)');
+    await db.insert(usedFoodTable, UsedFood(null, 1, 1, 'キャベツ', Unit.piece, 1, 100, 'メモ', 1 , DateTime.now(), null).toMap());
+
   }
 //---------食糧庫 START---------------
   // 全て取得
   Future<List<FoodStorage>> getFoodStorage() async {
     final result = await database.query(storageTable, orderBy: '$colCreatedAt DESC');
-    debugPrint(result.toString());
+    // debugPrint(result.toString());
     return result.map((Map<String, dynamic> food) => FoodStorage.fromMapObject(food)).toList();
   }
-
 
   /*
   * 【INSERT】 食糧庫 リストを全て登録
    */
-  Future<void> insertStorage(List<Food> foods) async {
+  Future<void> insertStorage(List<FoodStorage> foodStorages) async {
     // await DatabaseHelper().insertStorage(card);
     database.transaction((txn) async {
-      foods.forEach((food) async {
+      foodStorages.forEach((foodStorage) async {
         final storage = FoodStorage(
           null,
-          food.foodName, //食品名前
-          food.unitKind, //単位
-          food.quantity, //数量
-          food.price, //金額
+          foodStorage.foodName, //食品名前
+          foodStorage.unitKind, //単位
+          foodStorage.quantity, //数量
+          foodStorage.price, //金額
           null,
           1,
           DateTime.now(),
@@ -103,11 +111,35 @@ class DatabaseHelper {
         );
         await txn.insert(storageTable, storage.toMap());
       });
-      // final result =  await txn.insert(storageTable, storageList.toMap()); // debugPrint('インサート時：$result');
-      // await txn.insert(storageTable, storage.toMap());
-      // var cardMap = card.toMap(); //IDをカードカードリストに反映
-      // cardMap['list_id'] = result;
-      // await await txn.insert(cardTable, cardMap);
+    });
+  }
+
+  /*
+  * 【INSERT】 使用した食糧 リストを全て登録
+   */
+  Future<void> insertUseFoods(List<FoodStorage> foodStorages,String dishName) async {
+    // await DatabaseHelper().insertStorage(card);
+    database.transaction((txn) async {
+      // 料理名
+      Dish dish = Dish(null, dishName, false, '', 1, DateTime.now(), null);
+      int dishId = await txn.insert(usedFoodTable, dish.toMap());
+
+      foodStorages.forEach((foodStorage) async {
+        UsedFood usedFood = UsedFood(
+          null,
+          dishId, // 料理ID
+          foodStorage.id, // 食糧庫ID
+          foodStorage.foodName, //食品名前
+          foodStorage.unitKind, //単位
+          foodStorage.quantity, //数量
+          foodStorage.price, //金額
+          null,
+          1,
+          DateTime.now(),
+          null
+        );
+        await txn.insert(usedFoodTable, usedFood.toMap());
+      });
     });
   }
 

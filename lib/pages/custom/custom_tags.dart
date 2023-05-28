@@ -18,6 +18,7 @@ class _CustomTagsState extends State<CustomTags> {
   EdgeInsets formPadding = const EdgeInsets.only(top:10.0, left:10.0, right:10.0);
   var selectTag;
   late var tags;
+
   @override
   void initState() {
     selectTag = widget.selected;
@@ -54,11 +55,8 @@ class _CustomTagsState extends State<CustomTags> {
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                 decoration: BoxDecoration(
-                  borderRadius: const BorderRadius.all(Radius.circular(32)),
-                  border: Border.all(
-                    width: 2,
-                    color: Colors.pink,
-                  ),
+                  borderRadius: const BorderRadius.all(Radius.circular(32),),
+                  border: Border.all(width: 2, color: Colors.pink,),
                   color: selectTag?.id == food?.id ? Colors.pink : null,
                 ),
                 child: Text(

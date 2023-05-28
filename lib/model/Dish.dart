@@ -3,7 +3,7 @@ import 'package:intl/intl.dart';
 class Dish {
   Dish(
     this.id,
-    this.foodId,
+    // this.foodId,
     this.dishName,
     this.isFavorite,
     this.memo,
@@ -13,7 +13,7 @@ class Dish {
   );
 
   int? id;
-  late int foodId;
+  // late int foodId;
   late String dishName;
   late bool isFavorite;
   String? memo;
@@ -25,7 +25,7 @@ class Dish {
   Map<String, dynamic> toMap() {
     Map<String, dynamic> map = <String, dynamic>{};
     map['id'] = id;
-    map['food_id'] = foodId;
+    // map['food_id'] = foodId;
     map['dish_name'] = dishName;
     map['is_favorite'] = isFavorite;
     map['memo'] = memo;
@@ -39,7 +39,7 @@ class Dish {
   Dish.fromMapObject(Map<String, dynamic> map) {
 //    print(map);
     id = map['id'];
-    foodId = map['food_id'];
+    // foodId = map['food_id'];
     dishName = map['dish_name'];
     isFavorite = map['is_favorite'];
     memo = map['memo'];

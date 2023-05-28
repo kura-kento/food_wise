@@ -1,8 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:food_wise/model/FoodStorage.dart';
-
 import '../../common/layout/appbar.dart';
 import '../../model/Food.dart';
 import '../../model/database_help.dart';
@@ -29,18 +27,18 @@ class InputFormState extends ConsumerState<InputForm> {
   ポイント対応　¥496
 ''';
 
- late var insertFoods;
+ late var insertFoodStorages;
  @override
   void initState() {
     // TODO: implement initState
-   insertFoods = [];
+   insertFoodStorages = [];
    textReplace();
     super.initState();
   }
 
   @override
   Widget build(BuildContext context) {
-    final insertFoods = ref.watch(insertFoodsProvider);
+   insertFoodStorages = ref.watch(insertFoodStoragesProvider);
     return Column(
       children: [
         CustomAppBar(
@@ -61,21 +59,21 @@ class InputFormState extends ConsumerState<InputForm> {
   }
 
  Future<void> _save() async {
-    if(insertFoods.isEmpty) {
+    if(insertFoodStorages.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('１つ以上入力して下さい'),
         ),
       );
     } else {
-      await DatabaseHelper().insertStorage(insertFoods);
+      await DatabaseHelper().insertStorage(insertFoodStorages);
+      insertFoodStorages = []; //初期化
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('保存に成功しました。'),
         ),
       );
     }
-
  }
 
   List<Map> textReplace() {

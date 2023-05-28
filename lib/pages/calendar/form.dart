@@ -1,24 +1,22 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:fraction/fraction.dart';
-import 'package:icofont_flutter/icofont_flutter.dart';
 import '../../common/app.dart';
 import '../../common/layout/appbar.dart';
 import '../../enum/Unit.dart';
-import '../../model/Food.dart';
 import '../../model/FoodStorage.dart';
 import '../../model/database_help.dart';
 import '../../widget/FoodForm.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-class DishForm extends StatefulWidget {
+class DishForm extends ConsumerStatefulWidget {
   const DishForm({Key? key}) : super(key: key);
 
   @override
-  State<DishForm> createState() => _DishFormState();
+  DishFormState createState() => DishFormState();
 }
 
-class _DishFormState extends State<DishForm> {
+class DishFormState extends ConsumerState<DishForm> {
   double padding = 10.0;
   EdgeInsets formPadding = const EdgeInsets.only(top:10.0, left:10.0, right:10.0);
   var focusNode = FocusNode();
@@ -27,21 +25,25 @@ class _DishFormState extends State<DishForm> {
 
   List<FoodStorage> foodStorages = [];
   double sumPrice = 0;
+  late var insertFoodStorages;
 
   @override
   void initState() {
     // TODO: implement initState
+    insertFoodStorages = [];
     selectStorage();
     super.initState();
   }
 
-  void updateMessage(double newMessage) {
+  void updateMessage(newMessage) {
     sumPrice = newMessage;
     setState(() {});
   }
 
   @override
   Widget build(BuildContext context) {
+    insertFoodStorages = ref.watch(insertFoodStoragesProvider);
+
     return SafeArea(
       child: Scaffold(
         body: GestureDetector(
@@ -55,7 +57,7 @@ class _DishFormState extends State<DishForm> {
                   children: <Widget>[
                     customAppBar(),// アップバー
                     dishTitle(),
-                    FoodFormWidget(foodStorages: foodStorages, onButtonPressed: updateMessage),
+                    FoodFormWidget(foodStorages: foodStorages, onButtonPressed: updateMessage, isFoodStorages: false,),
                     memo(), // メモ
                   ],
                 ),
@@ -77,7 +79,7 @@ class _DishFormState extends State<DishForm> {
         ),
         rightButton: const Text('保存', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold,),),
         onTap:() {
-          // _save();
+          _save();
           Navigator.pop(context);
           setState(() {});
         }
@@ -155,5 +157,23 @@ class _DishFormState extends State<DishForm> {
         ),
       ),
     );
+  }
+
+  Future<void> _save() async {
+    if(insertFoodStorages.isEmpty) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('１つ以上入力して下さい'),
+        ),
+      );
+    } else {
+      await DatabaseHelper().insertStorage(insertFoodStorages);
+      insertFoodStorages = []; //初期化
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('保存に成功しました。'),
+        ),
+      );
+    }
   }
 }
