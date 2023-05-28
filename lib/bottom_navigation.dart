@@ -5,8 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:food_wise/pages/calendar/calendar_page.dart';
 import 'package:food_wise/pages/calendar/form.dart';
-import 'package:food_wise/pages/card/ImageOcrPage,dart.dart';
-import 'package:food_wise/pages/card/list.dart';
 import 'package:food_wise/pages/input/input.dart';
 import 'package:food_wise/pages/setting_page.dart';
 import 'package:google_mobile_ads/google_mobile_ads.dart';
@@ -30,12 +28,11 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
   final _pageWidgets = [
     // const ImageOCR(),
     // MemoHome(),
-    DishForm(),
+    CalendarPage(),
     InputForm(),
+    DishForm(),
 
     // const CardList(),
-
-
     // CalendarPage(),
     SettingPage(),
   ];
