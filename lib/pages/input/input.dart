@@ -30,8 +30,6 @@ class InputFormState extends ConsumerState<InputForm> {
  late var insertFoodStorages;
  @override
   void initState() {
-    // TODO: implement initState
-   insertFoodStorages = [];
    textReplace();
     super.initState();
   }
@@ -67,7 +65,7 @@ class InputFormState extends ConsumerState<InputForm> {
       );
     } else {
       await DatabaseHelper().insertStorage(insertFoodStorages);
-      insertFoodStorages = []; //初期化
+      insertFoodStorages.clear();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('保存に成功しました。'),

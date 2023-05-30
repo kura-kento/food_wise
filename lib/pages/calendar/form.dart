@@ -29,8 +29,6 @@ class DishFormState extends ConsumerState<DishForm> {
 
   @override
   void initState() {
-    // TODO: implement initState
-    insertFoodStorages = [];
     selectStorage();
     super.initState();
   }
@@ -168,7 +166,7 @@ class DishFormState extends ConsumerState<DishForm> {
       );
     } else {
       await DatabaseHelper().insertStorage(insertFoodStorages);
-      insertFoodStorages = []; //初期化
+      insertFoodStorages.clear();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('保存に成功しました。'),

@@ -43,6 +43,9 @@ class App {
     Colors.grey[300],
     Colors.blue[200]];
 
+  static Color? plusColor = Colors.lightBlueAccent[200];
+  static Color? minusColor = Colors.redAccent[200];
+
 
 
   //画像をパスにローカル保存

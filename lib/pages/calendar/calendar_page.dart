@@ -4,18 +4,18 @@ import 'package:app_review/app_review.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_slidable/flutter_slidable.dart';
 import 'package:food_wise/common/layout/appbar.dart';
 import 'package:intl/intl.dart';
 import '../../common/app.dart';
 import '../../common/shared_prefs.dart';
 import '../../common/utils.dart';
+import '../../model/FoodStorage.dart';
+import 'Widget/daySquare.dart';
+import 'Widget/week.dart';
 
-class Day {
-  Day(this.name, this.color);
-  String name;
-  Color color;
-}
+final selectDayProvider = StateProvider<DateTime>((ref) => DateTime.now());
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({Key? key}) : super(key: key);
@@ -40,15 +40,7 @@ class _CalendarPageState extends State<CalendarPage> {
   // int _realIndex= 1000000000;
 
   bool isLoading = true;
-  List<Day> week = [
-    Day('日', Colors.red[200]!),
-    Day('月', Colors.grey[300]!),
-    Day('火', Colors.grey[300]!),
-    Day('水', Colors.grey[300]!),
-    Day('木', Colors.grey[300]!),
-    Day('金', Colors.grey[300]!),
-    Day('土', Colors.blue[200]!),
-  ];
+
 
   @override
   void initState() {
@@ -145,9 +137,8 @@ class _CalendarPageState extends State<CalendarPage> {
                     Expanded(
                       child: Column(
                         children: <Widget>[
-                          //曜日用に1行作る。
-                          weekWidget(),
-                          ...dayList(),
+                          Week(),// 曜日
+                          DaySquare(), // 日付ごとの四角の枠
                           ...memoList(),
                         ],
                       )
@@ -253,146 +244,128 @@ class _CalendarPageState extends State<CalendarPage> {
   //       )
   //   );
   //   return _widgets;
-  // }
-
-  //カレンダーの曜日部分（1行目）
-  Widget weekWidget() {
-    final result = <Widget>[];
-    for (var day in week) {
-      result.add(
-        Expanded(
-          flex: 1,
-          child: Container(
-            alignment: Alignment.center,
-            color: day.color,
-            child: Text(day.name),
-          ),
-        ),
-      );
-    }
-    return Row(children: result);
-  }
+  //
   
 //カレンダーの日付部分（2行目以降）
-  List<Widget> dayList() {
-    final resultWeekList = <Widget>[];
-    for (var j = 0; j < 6; j++) {
-      final resultWeek = <Widget>[];
-      for (var i = 0; i < week.length; i++) {
-        resultWeek.add(
-          Expanded( flex: 1, child: calendarSquare(calendarDay(i, j)),),
-        );
-      }
-      resultWeekList.add(Row(children: resultWeek));
-      //土曜日の月が選択月でない　または、月末の場合は終わる。
-      if (Utils.toInt(calendarDay(6, j).month) != selectOfMonth(selectMonthValue).month
-          || endOfMonth() == Utils.toInt(calendarDay(6, j).day)) {
-        break;
-      }
-    }
-    return resultWeekList;
-  }
+//   List<Widget> dayList() {
+//     final resultWeekList = <Widget>[];
+//     for (var j = 0; j < 6; j++) {
+//       final resultWeek = <Widget>[];
+//       for (var i = 0; i < 7; i++) {
+//         resultWeek.add(
+//           Expanded( flex: 1, child: calendarSquare(calendarDay(i, j)),),
+//         );
+//       }
+//       resultWeekList.add(Row(children: resultWeek));
+//       //土曜日の月が選択月でない　または、月末の場合は終わる。
+//       if (Utils.toInt(calendarDay(6, j).month) != selectOfMonth(selectMonthValue).month
+//           || endOfMonth() == Utils.toInt(calendarDay(6, j).day)) {
+//         break;
+//       }
+//     }
+//     return resultWeekList;
+//   }
 
 //カレンダー１日のマス（その月以外は空白にする）
-  Widget calendarSquare(DateTime date) {
-    if(date.month == selectOfMonth(selectMonthValue).month) {
-      return Container(
-        color: Colors.grey[100],
-        height: 50.0,
-        child: Stack(
-          children: <Widget>[
-            Container(
-              width: double.infinity,
-              decoration: BoxDecoration(
-                border: Border.all(width: 1, color: Colors.white),
-                color:  DateFormat.yMMMd().format(selectDay) ==  DateFormat.yMMMd().format(date)  ? Colors.yellow[300] : Colors.transparent ,
-              ),
-              child: Column(
-                  children: squareValue(date)
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: Row(
-                // crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    flex: 2,
-                    child: Container(
-                      height: 46/3,
-                      color: DateFormat.yMMMd().format(date) == DateFormat.yMMMd().format(_today) ? Colors.red[300] : Colors.transparent ,
-                      child: Center(
-                        child: Text(
-                          '${Utils.toInt(date.day)}',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            fontSize: Utils.parseSize(context, 10.0),
-                            color: DateFormat.yMMMd().format(date) ==  DateFormat.yMMMd().format(_today) ? Colors.white : Colors.black87 ,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Spacer(flex: 3,)
-                ],
-              ),
-            ),
-            //クリック時選択表示する。
-            TextButton(
-              child: Container(),
-              onPressed: () async {
-                // if(selectDay == date) {
-                //   await Navigator.of(context).push(
-                //     MaterialPageRoute(
-                //       builder: (context) {
-                //         return EditForm(selectDay: selectDay,inputMode: InputMode.create);
-                //       },
-                //     ),
-                //   );
-                //   updateListViewCategory();
-                //   dataUpdate();
-                //   reviewCount();
-                // }else{
-                //   selectDay = date;
-                //   setState((){});
-                // }
-              },
-            ),
-          ],
-        ),
-      );
-    }else{
-      return Container(
-        color: Colors.grey[200],
-        height: 50.0,
-      );
-    }
-  }
+//   Widget calendarSquare(DateTime date) {
+//     if(date.month == selectOfMonth(selectMonthValue).month) {
+//       return Container(
+//         color: Colors.grey[100],
+//         height: 50.0,
+//         child: Stack(
+//           children: <Widget>[
+//             Container(
+//               width: double.infinity,
+//               decoration: BoxDecoration(
+//                 border: Border.all(width: 1, color: Colors.white),
+//                 color:  DateFormat.yMMMd().format(selectDay) ==  DateFormat.yMMMd().format(date)  ? Colors.yellow[300] : Colors.transparent ,
+//               ),
+//               child: Column(
+//                   children: squareValue(date)
+//               ),
+//             ),
+//             Padding(
+//               padding: const EdgeInsets.all(2.0),
+//               child: Row(
+//                 // crossAxisAlignment: CrossAxisAlignment.start,
+//                 children: <Widget>[
+//                   Expanded(
+//                     flex: 2,
+//                     child: Container(
+//                       height: 46/3,
+//                       color: DateFormat.yMMMd().format(date) == DateFormat.yMMMd().format(_today) ? Colors.red[300] : Colors.transparent ,
+//                       child: Center(
+//                         child: Text(
+//                           '${Utils.toInt(date.day)}',
+//                           textAlign: TextAlign.left,
+//                           style: TextStyle(
+//                             fontSize: Utils.parseSize(context, 10.0),
+//                             color: DateFormat.yMMMd().format(date) ==  DateFormat.yMMMd().format(_today) ? Colors.white : Colors.black87 ,
+//                           ),
+//                         ),
+//                       ),
+//                     ),
+//                   ),
+//                   Spacer(flex: 3,)
+//                 ],
+//               ),
+//             ),
+//             //クリック時選択表示する。
+//             TextButton(
+//               child: Container(),
+//               onPressed: () async {
+//                 // if(selectDay == date) {
+//                 //   await Navigator.of(context).push(
+//                 //     MaterialPageRoute(
+//                 //       builder: (context) {
+//                 //         return EditForm(selectDay: selectDay,inputMode: InputMode.create);
+//                 //       },
+//                 //     ),
+//                 //   );
+//                 //   updateListViewCategory();
+//                 //   dataUpdate();
+//                 //   reviewCount();
+//                 // }else{
+//                 //   selectDay = date;
+//                 //   setState((){});
+//                 // }
+//               },
+//             ),
+//           ],
+//         ),
+//       );
+//     }else{
+//       return Container(
+//         color: Colors.grey[200],
+//         height: 50.0,
+//       );
+//     }
+//   }
 
-  //１日のマスの中身
-  List<Widget> squareValue(DateTime date) {
-    final resultWeekList = <Widget>[Expanded(flex: 1, child: Container())];
-    for(var i =0; i<2; i++){
-      resultWeekList.add(
-        Expanded(
-            flex: 1,
-            child: Container(
-                child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      moneyOfDay(i,date),
-                      style: TextStyle(
-                        // color: i == 0 ? App.plusColor:App.minusColor
-                      ),
-                      maxLines: 1,
-                    )
-                )
-            )
-        ),
-      );
-    }
-    return resultWeekList;
-  }
+  // //１日のマスの中身
+  // List<Widget> squareValue(DateTime date) {
+  //   final resultWeekList = <Widget>[Expanded(flex: 1, child: Container())];
+  //   for(var i =0; i<2; i++){
+  //     resultWeekList.add(
+  //       Expanded(
+  //           flex: 1,
+  //           child: Container(
+  //               child: Align(
+  //                   alignment: Alignment.centerRight,
+  //                   child: Text(
+  //                     moneyOfDay(i,date),
+  //                     style: TextStyle(
+  //                       // color: i == 0 ? App.plusColor:App.minusColor
+  //                     ),
+  //                     maxLines: 1,
+  //                   )
+  //               )
+  //           )
+  //       ),
+  //     );
+  //   }
+  //   return resultWeekList;
+  // }
 
   //一日のリスト（カレンダー下）
   List<Widget> memoList() {
@@ -404,14 +377,12 @@ class _CalendarPageState extends State<CalendarPage> {
           InkWell(
             child: Container(
               height: 40,
-              decoration: BoxDecoration(
+              decoration: const BoxDecoration(
                 border: Border(
                   bottom:BorderSide(width: 1, color: Colors.black26),
                 ),
               ),
               child: Slidable(
-                //TODO: actionPane: const SlidableDrawerActionPane(),
-                //TODO: actionExtentRatio: 0.15,
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
@@ -419,7 +390,7 @@ class _CalendarPageState extends State<CalendarPage> {
                     Center(
                       child: Text(
                           '${Utils.commaSeparated(calendarList[i].money)}${SharedPrefs.getUnit()}　',
-                          style: TextStyle(
+                          style: const TextStyle(
                               // color: calendarList[i].money >= 0 ? App.plusColor : App.minusColor
                           )
                       ),
