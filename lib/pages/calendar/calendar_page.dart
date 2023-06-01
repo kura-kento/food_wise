@@ -12,18 +12,19 @@ import '../../common/app.dart';
 import '../../common/shared_prefs.dart';
 import '../../common/utils.dart';
 import '../../model/FoodStorage.dart';
+import '../../model/database_help.dart';
 import 'Widget/daySquare.dart';
 import 'Widget/week.dart';
 
 final selectDayProvider = StateProvider<DateTime>((ref) => DateTime.now());
 
-class CalendarPage extends StatefulWidget {
+class CalendarPage extends ConsumerStatefulWidget {
   const CalendarPage({Key? key}) : super(key: key);
   @override
-  _CalendarPageState createState() => _CalendarPageState();
+  CalendarPageState createState() => CalendarPageState();
 }
 
-class _CalendarPageState extends State<CalendarPage> {
+class CalendarPageState extends ConsumerState<CalendarPage> {
   // List<Calendar> calendarList = <Calendar>[];
 
   //表示月
@@ -105,6 +106,7 @@ class _CalendarPageState extends State<CalendarPage> {
 
   @override
   Widget build(BuildContext context) {
+    selectDay = ref.watch(selectDayProvider);
 
     return Column(
       children: [
@@ -139,7 +141,7 @@ class _CalendarPageState extends State<CalendarPage> {
                         children: <Widget>[
                           Week(),// 曜日
                           DaySquare(), // 日付ごとの四角の枠
-                          ...memoList(),
+                          dishesWidget(),
                         ],
                       )
                     ),
@@ -368,7 +370,8 @@ class _CalendarPageState extends State<CalendarPage> {
   // }
 
   //一日のリスト（カレンダー下）
-  List<Widget> memoList() {
+  List<Widget> memoList()  {
+    // var result = await DatabaseHelper().nowDishes(selectDay);
     final resultWeekList = <Widget>[];
     var calendarList = [];
     for(var i = 0; i < calendarList.length ; i++) {
@@ -378,15 +381,12 @@ class _CalendarPageState extends State<CalendarPage> {
             child: Container(
               height: 40,
               decoration: const BoxDecoration(
-                border: Border(
-                  bottom:BorderSide(width: 1, color: Colors.black26),
-                ),
-              ),
+                border: Border(bottom: BorderSide(width: 1, color: Colors.black26),),),
               child: Slidable(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: <Widget>[
-                    Text('調整前'),
+                    const Text('調整前'),
                     Center(
                       child: Text(
                           '${Utils.commaSeparated(calendarList[i].money)}${SharedPrefs.getUnit()}　',
@@ -426,6 +426,44 @@ class _CalendarPageState extends State<CalendarPage> {
       }
     }
     return resultWeekList;
+  }
+
+  Widget dishesWidget()  {
+    return FutureBuilder(
+        future: DatabaseHelper().selectDayDishes(selectDay), // Future<T> 型を返す非同期処理
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.hasData) {
+           var  dish = snapshot.data;
+            return Expanded(
+              child: ListView.builder(
+                itemCount: dish.length,
+                itemBuilder: (itemBuilder, index) {
+                  return InkWell(
+                    child: Container(
+                      height: 40,
+                      decoration: const BoxDecoration(
+                        border: Border(bottom: BorderSide(width: 1, color: Colors.black26),),),
+                      child: Slidable(
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: <Widget>[
+                            Text(dish[index]['dish_name']),
+                            Center(
+                              child: Text(""),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    onTap: () async {
+                    },
+                  );
+              }),
+            );
+          } else {
+            return const CircularProgressIndicator();
+          }
+        });
   }
 
   Future<void> updateListView(DateTime month) async {

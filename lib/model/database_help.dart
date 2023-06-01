@@ -7,6 +7,7 @@ import 'Dish.dart';
 import 'Food.dart';
 import 'FoodStorage.dart';
 import 'UsedFoodTable.dart';
+import 'package:intl/intl.dart';
 
 class DatabaseHelper {
 
@@ -76,7 +77,8 @@ class DatabaseHelper {
     await db.insert(storageTable, FoodStorage(null, 'もやし', Unit.g, 200, 40, 'メモ', 1 , DateTime.now(), null).toMap());
 
     // 料理テーブル
-    await db.execute('CREATE TABLE $dishTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $dishName TEXT, $colMemo TEXT, $colSort INTEGER, $colCreatedAt TEXT, $colDeletedAt TEXT)');
+    await db.execute('CREATE TABLE $dishTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $dishName TEXT, $isFavorite INTEGER, $colMemo TEXT, $colSort INTEGER, $colCreatedAt TEXT, $colDeletedAt TEXT)');
+    await db.insert(dishTable, Dish(null, 'キャベツ焼', false, 'メモ', 1 , DateTime.now(), null).toMap());
 
     // 使用済　食材テーブル
     await db.execute('CREATE TABLE $usedFoodTable($colId INTEGER PRIMARY KEY AUTOINCREMENT, $dishId INTEGER, $foodStorageId INTEGER, $colFoodName TEXT, $colUnitKind TEXT, $colQuantity REAL, $colPrice REAL, $colMemo TEXT, $colSort INTEGER, $colCreatedAt TEXT, $colDeletedAt TEXT)');
@@ -141,6 +143,27 @@ class DatabaseHelper {
         await txn.insert(usedFoodTable, usedFood.toMap());
       });
     });
+  }
+
+  /*
+  * 【SELECT】 選択日の料理リストと金額一覧
+   */
+  Future<List> selectDayDishes(DateTime _date) async {
+      String date = DateFormat('yyyy-MM-dd').format(_date);
+      final result = await database.rawQuery(
+      '''
+        SELECT * FROM dishes
+        LEFT OUTER JOIN 
+        (
+          SELECT SUM(price), dish_id
+          FROM used_foods
+          GROUP BY dish_id
+        ) AS used_foods
+        ON dishes.id = used_foods.dish_id
+        WHERE dishes.created_at LIKE '$date%'
+      '''
+      );
+    return result;
   }
 
   Future<void> updateStorage(FoodStorage storage) async {

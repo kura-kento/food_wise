@@ -27,7 +27,7 @@ class Dish {
     map['id'] = id;
     // map['food_id'] = foodId;
     map['dish_name'] = dishName;
-    map['is_favorite'] = isFavorite;
+    map['is_favorite'] = isFavorite == 1 ? 1 : 0;
     map['memo'] = memo;
     map['sort'] = sort;
     map['created_at'] = DateFormat('yyyy-MM-dd HH:mm').format(createdAt!);
@@ -41,7 +41,7 @@ class Dish {
     id = map['id'];
     // foodId = map['food_id'];
     dishName = map['dish_name'];
-    isFavorite = map['is_favorite'];
+    isFavorite = map['is_favorite'] != 1 ? true : false;
     memo = map['memo'];
     sort = map['sort'];
     createdAt = DateTime.parse(map['created_at']);

@@ -149,6 +149,7 @@ setState((){});
   //カレンダー表示している日の合計
   String moneyOfDay(int _index, DateTime date) {
     return '金額0円';
+
     // double _plusMoney = 0;
     // double _minusMoney = 0;
     // for (var index = 0; index < calendarList.length; index++) {
