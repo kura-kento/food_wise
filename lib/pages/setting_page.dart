@@ -54,7 +54,7 @@ class _SettingPageState extends State<SettingPage> {
                           height: 40,
                           width: MediaQuery.of(context).size.width,
                           color: Colors.grey[300],
-                          child: Align(
+                          child: const Align(
                             alignment: Alignment.center,
                             child: Text('設定', style: TextStyle(fontSize: 20,color: Colors.black)),
                           )
@@ -77,23 +77,21 @@ class _SettingPageState extends State<SettingPage> {
                                     )
                                 ),
                                 ListTile(
-                                  title: Container(
-                                    child: TextField(
-                                      controller: passwordController,
-                                      maxLength: 8,
-                                      keyboardType: TextInputType.number,
-                                      inputFormatters: <TextInputFormatter>[
-                                        FilteringTextInputFormatter.digitsOnly
-                                        // FilteringTextInputFormatter.allow(RegExp(r'[0–9]+'))
-                                      ],
-                                      decoration: InputDecoration(
-                                        labelText: "パスワード",
-                                        border: OutlineInputBorder(),
-                                      ),
-                                      onChanged: (String value){
-                                        SharedPrefs.setPassword(value);
-                                      },
+                                  title: TextField(
+                                    controller: passwordController,
+                                    maxLength: 8,
+                                    keyboardType: TextInputType.number,
+                                    inputFormatters: <TextInputFormatter>[
+                                      FilteringTextInputFormatter.digitsOnly
+                                      // FilteringTextInputFormatter.allow(RegExp(r'[0–9]+'))
+                                    ],
+                                    decoration: const InputDecoration(
+                                      labelText: "パスワード",
+                                      border: OutlineInputBorder(),
                                     ),
+                                    onChanged: (String value){
+                                      SharedPrefs.setPassword(value);
+                                    },
                                   )
                                 ),
                                 Divider(color: Colors.grey,height:0),

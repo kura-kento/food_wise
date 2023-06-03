@@ -9,33 +9,31 @@ import '../calendar_page.dart';
 
 class DaySquare extends ConsumerStatefulWidget {
   const DaySquare({Key? key}) : super(key: key);
-
   @override
   DaySquareState createState() => DaySquareState();
 }
 
 class DaySquareState extends ConsumerState<DaySquare> {
-  int selectMonthValue = 0; //表示月
   final DateTime _today = DateTime.now();
   // //選択している日
   late DateTime selectDay;
-
+  late int addMonth;
   @override
   Widget build(BuildContext context) {
     selectDay = ref.watch(selectDayProvider);
+    addMonth = ref.watch(addMonthProvider);
 
     final resultWeekList = <Widget>[];
     for (var j = 0; j < 6; j++) {
       final resultWeek = <Widget>[];
       for (var i = 0; i < 7; i++) {
         resultWeek.add(
-          Expanded( flex: 1, child: calendarSquare(calendarDay(i, j)),),
+          Expanded(flex: 1, child: calendarSquare(calendarDay(i, j)),),
         );
       }
       resultWeekList.add(Row(children: resultWeek));
       //土曜日の月が選択月でない　または、月末の場合は終わる。
-      if (Utils.toInt(calendarDay(6, j).month) != selectOfMonth(selectMonthValue).month
-          || endOfMonth() == Utils.toInt(calendarDay(6, j).day)) {
+      if (Utils.toInt(calendarDay(6, j).month) != selectOfMonth(addMonth).month || endOfMonth() == Utils.toInt(calendarDay(6, j).day)) {
         break;
       }
     }
@@ -44,7 +42,7 @@ class DaySquareState extends ConsumerState<DaySquare> {
 
   //カレンダー１日のマス（その月以外は空白にする）
   Widget calendarSquare(DateTime date) {
-    if(date.month == selectOfMonth(selectMonthValue).month) {
+    if(date.month == selectOfMonth(addMonth).month) {
       return Container(
         color: Colors.grey[100],
         height: 50.0,
@@ -103,9 +101,8 @@ class DaySquareState extends ConsumerState<DaySquare> {
                   // reviewCount();
                   // setState((){});
                 }else{
-                  // ref.read(selectDayProvider.state) = date;
-                  selectDay = date;
-setState((){});
+                  ref.read(selectDayProvider.notifier).state = date;
+                  setState((){});
                 }
               },
             ),
@@ -113,31 +110,26 @@ setState((){});
         ),
       );
     }else{
-      return Container(
-        color: Colors.grey[200],
-        height: 50.0,
-      );
+      return Container(height: 50.0, color: Colors.grey[200],);
     }
   }
 
   //１日のマスの中身
   List<Widget> squareValue(DateTime date) {
     final resultWeekList = <Widget>[Expanded(flex: 1, child: Container())];
-    for(var i =0; i<2; i++){
+    for(var i =0; i < 2; i++) {
       resultWeekList.add(
         Expanded(
             flex: 1,
-            child: Container(
-                child: Align(
-                    alignment: Alignment.centerRight,
-                    child: Text(
-                      moneyOfDay(i,date),
-                      style: TextStyle(
-                        color: i == 0 ? App.plusColor : App.minusColor ,
-                        fontSize: 10,
-                      ),
-                      maxLines: 1,
-                    )
+            child: Align(
+                alignment: Alignment.centerRight,
+                child: Text(
+                  moneyOfDay(i,date),
+                  style: TextStyle(
+                    color: i == 0 ? App.plusColor : App.minusColor ,
+                    fontSize: 10,
+                  ),
+                  maxLines: 1,
                 )
             )
         ),
@@ -166,15 +158,14 @@ setState((){});
 
   //iとjから日程のデータを出す（Date型）
   DateTime calendarDay(int i,int j) {
-    final startDay = DateTime(_today.year, _today.month + selectMonthValue, 1);
+    final startDay = DateTime(_today.year, _today.month + addMonth, 1);
     final weekNumber = startDay.weekday;
-    final calendarStartDay =
-    startDay.add(Duration(days: -(weekNumber % 7) + (i + 7 * j)));
+    final calendarStartDay = startDay.add(Duration(days: -(weekNumber % 7) + (i + 7 * j)));
     return calendarStartDay;
   }
 //月末の日を取得（来月の１日を取得して１引く）
   int endOfMonth() {
-    final startDay = DateTime(_today.year, _today.month + 1 + selectMonthValue, 1);
+    final startDay = DateTime(_today.year, _today.month + 1 + addMonth, 1);
     final endOfMonth = startDay.add(const Duration(days: -1));
     final _endOfMonth = Utils.toInt(endOfMonth.day);
     return _endOfMonth;

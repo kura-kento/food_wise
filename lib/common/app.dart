@@ -19,6 +19,8 @@ class App {
   static int addHours = 40;
   static double BTNfontsize = 10;
   static double drawer_width = 300.0;
+
+  static int infinityPage = 1000;
   //
   static Color btn_color = Colors.white;
   static Color text_color = Colors.black54;
