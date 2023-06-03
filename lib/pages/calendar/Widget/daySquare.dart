@@ -102,7 +102,7 @@ class DaySquareState extends ConsumerState<DaySquare> {
                   // setState((){});
                 }else{
                   ref.read(selectDayProvider.notifier).state = date;
-                  setState((){});
+                  // setState((){});
                 }
               },
             ),

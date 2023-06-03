@@ -155,7 +155,7 @@ class DatabaseHelper {
         SELECT * FROM dishes
         LEFT OUTER JOIN 
         (
-          SELECT SUM(price), dish_id
+          SELECT SUM(price) AS sum_price, dish_id
           FROM used_foods
           GROUP BY dish_id
         ) AS used_foods

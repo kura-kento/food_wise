@@ -138,14 +138,19 @@ class CalendarPageState extends ConsumerState<CalendarPage> {
                       leftButton: IconButton(
                         onPressed: () {
                           ref.read(addMonthProvider.notifier).state--;
+                          ref.read(selectDayProvider.notifier).state = selectOfMonth(addMonth);
                           setState(() {});
                         },
                         iconSize: 45, icon: const Icon(Icons.arrow_left, color: Colors.white,),
                       ),
                       rightButton: IconButton(
                         onPressed: () {
+                          print(addMonth);
                           ref.read(addMonthProvider.notifier).state++;
-                          setState(() {});
+                          print(addMonth);
+                          ref.read(selectDayProvider.notifier).state = selectOfMonth(addMonth);
+                          print(selectOfMonth(addMonth));
+                          // setState(() {});
                         },
                         iconSize: 45, icon: const Icon(Icons.arrow_right, color: Colors.white,),
                       ),
@@ -197,14 +202,13 @@ class CalendarPageState extends ConsumerState<CalendarPage> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: <Widget>[
                             Text(dish[index]['dish_name']),
-                            Center(
-                              child: Text(""),
-                            ),
+                            Text('${Utils.formatNumber(dish[index]['sum_price'])}円'),
                           ],
                         ),
                       ),
                     ),
                     onTap: () async {
+
                     },
                   );
               }),
