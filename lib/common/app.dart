@@ -25,7 +25,7 @@ class App {
   static Color btn_color = Colors.white;
   static Color text_color = Colors.black54;
   static Color primary_color = Color(int.parse(SharedPrefs.getCustomColor()));
-  static double appbar_height = 60.0;
+  static double appbar_height = 50.0;
 
   static int minLines = 50;
   static double goldenRatio = 1.618;
@@ -77,12 +77,12 @@ class App {
     return brightness == Brightness.dark;
   }
 
-  static Widget title(String title, {double fontSize = 20.0}) {
+  static Widget title(String title, Color? fontColor, {double fontSize = 20.0}) {
     return  Text(
       title,
       style: TextStyle(
         fontSize: fontSize,
-        color: Colors.white,
+        color: fontColor ?? Colors.white,
         fontWeight: FontWeight.bold,
       ),
     );

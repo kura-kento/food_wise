@@ -9,11 +9,16 @@ class CustomAppBar extends StatefulWidget {
      this.leftButton,
      this.rightButton,
      this.onTap,
+     this.color,
+     this.fontColor,
    }) : super(key: key);
 
   String? title;
   Widget? leftButton;
   Widget? rightButton;
+  Color? color;
+  Color? fontColor;
+
   void Function()? onTap;
   @override
   State<CustomAppBar> createState() => _CustomAppBarState();
@@ -24,7 +29,7 @@ class _CustomAppBarState extends State<CustomAppBar> {
   Widget build(BuildContext context) {
     return Container(
       height: App.appbar_height,
-      color:  App.primary_color,
+      color:  widget.color ?? App.primary_color,
       child: Row(
         children: <Widget>[
           Expanded(
@@ -36,8 +41,8 @@ class _CustomAppBarState extends State<CustomAppBar> {
           Expanded(
             flex: 5,
             child: InkWell(
-                child: Center(child: App.title(widget.title ?? ''),),
                 onTap: widget.onTap ?? () => {},
+                child: Center(child: App.title(widget.title ?? '', widget.fontColor),),
             ),
           ),
           Expanded(

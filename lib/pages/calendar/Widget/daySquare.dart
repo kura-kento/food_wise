@@ -140,7 +140,8 @@ class DaySquareState extends ConsumerState<DaySquare> {
 
   //カレンダー表示している日の合計
   String moneyOfDay(int _index, DateTime date) {
-    return '金額0円';
+
+    return date.toString();
 
     // double _plusMoney = 0;
     // double _minusMoney = 0;

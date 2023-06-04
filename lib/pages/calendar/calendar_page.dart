@@ -132,21 +132,28 @@ class CalendarPageState extends ConsumerState<CalendarPage> {
                     ),
                     CustomAppBar(
                       title: DateFormat('yyyy年MM月').format(selectOfMonth(addMonth)),
+                      color: Colors.black12,
+                      fontColor: Colors.black87,
                       leftButton: IconButton(
                         onPressed: () {
-                          ref.read(addMonthProvider.notifier).state--;
-                          ref.read(selectDayProvider.notifier).state = selectOfMonth(addMonth-1);
+                          pageController.animateToPage(
+                            App.infinityPage + addMonth - 1, // 変更したいページのインデックス
+                            duration: const Duration(milliseconds: 300), // アニメーションの時間
+                            curve: Curves.ease, // アニメーションのカーブ
+                          );
                           // setState(() {});
                         },
-                        iconSize: 45, icon: const Icon(Icons.arrow_left, color: Colors.white,),
+                        iconSize: 45, icon: const Icon(Icons.arrow_left, color: Colors.black87,),
                       ),
                       rightButton: IconButton(
                         onPressed: () {
-                          ref.read(addMonthProvider.notifier).state++;
-                          ref.read(selectDayProvider.notifier).state = selectOfMonth(addMonth + 1);
-                          // setState(() {});
+                          pageController.animateToPage(
+                            App.infinityPage + addMonth + 1, // 変更したいページのインデックス
+                            duration: const Duration(milliseconds: 300), // アニメーションの時間
+                            curve: Curves.ease, // アニメーションのカーブ
+                          );
                         },
-                        iconSize: 45, icon: const Icon(Icons.arrow_right, color: Colors.white,),
+                        iconSize: 45, icon: const Icon(Icons.arrow_right, color: Colors.black87,),
                       ),
                     ),
                     Week(),// 曜日
