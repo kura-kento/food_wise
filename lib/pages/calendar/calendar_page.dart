@@ -34,11 +34,8 @@ class CalendarPageState extends ConsumerState<CalendarPage> {
   // //選択している日
   DateTime selectDay = DateTime.now();
   late int addMonth;
-  // int _initialPage = 0;
-  // int _scrollIndex = 0;
 
   PageController pageController = PageController(initialPage: App.infinityPage);
-
 
   @override
   void initState() {
@@ -138,18 +135,15 @@ class CalendarPageState extends ConsumerState<CalendarPage> {
                       leftButton: IconButton(
                         onPressed: () {
                           ref.read(addMonthProvider.notifier).state--;
-                          ref.read(selectDayProvider.notifier).state = selectOfMonth(addMonth);
-                          setState(() {});
+                          ref.read(selectDayProvider.notifier).state = selectOfMonth(addMonth-1);
+                          // setState(() {});
                         },
                         iconSize: 45, icon: const Icon(Icons.arrow_left, color: Colors.white,),
                       ),
                       rightButton: IconButton(
                         onPressed: () {
-                          print(addMonth);
                           ref.read(addMonthProvider.notifier).state++;
-                          print(addMonth);
-                          ref.read(selectDayProvider.notifier).state = selectOfMonth(addMonth);
-                          print(selectOfMonth(addMonth));
+                          ref.read(selectDayProvider.notifier).state = selectOfMonth(addMonth + 1);
                           // setState(() {});
                         },
                         iconSize: 45, icon: const Icon(Icons.arrow_right, color: Colors.white,),
@@ -159,9 +153,11 @@ class CalendarPageState extends ConsumerState<CalendarPage> {
                     Expanded(
                       child: PageView.builder(
                         controller: pageController,
+                        onPageChanged: (index) { //引数では移動先のインデックスを受け取る
+                          ref.read(addMonthProvider.notifier).state = index - App.infinityPage;
+                          ref.read(selectDayProvider.notifier).state = selectOfMonth(index - App.infinityPage);
+                        },
                         itemBuilder: (context, index) {
-                          //ページのインデックスをページ数で割った値を使う
-                          // ref.read(addMonthProvider.notifier).state = index - App.infinityPage;
                           return Column(
                             children: [
                               DaySquare(),
