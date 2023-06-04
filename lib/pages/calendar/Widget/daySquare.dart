@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import '../../../common/app.dart';
 import '../../../common/utils.dart';
+import '../../../model/database_help.dart';
 import '../calendar_page.dart';
 
 
@@ -18,6 +19,8 @@ class DaySquareState extends ConsumerState<DaySquare> {
   // //選択している日
   late DateTime selectDay;
   late int addMonth;
+
+
   @override
   Widget build(BuildContext context) {
     selectDay = ref.watch(selectDayProvider);
@@ -54,58 +57,10 @@ class DaySquareState extends ConsumerState<DaySquare> {
                 border: Border.all(width: 1, color: Colors.white),
                 color:  DateFormat.yMMMd().format(selectDay) ==  DateFormat.yMMMd().format(date)  ? Colors.yellow[300] : Colors.transparent ,
               ),
-              child: Column(
-                  children: squareValue(date)
-              ),
+              child: squareValue(date)
             ),
-            Padding(
-              padding: const EdgeInsets.all(2.0),
-              child: Row(
-                // crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Expanded(
-                    flex: 2,
-                    child: Container(
-                      height: 46/3,
-                      color: DateFormat.yMMMd().format(date) == DateFormat.yMMMd().format(_today) ? Colors.red[300] : Colors.transparent ,
-                      child: Center(
-                        child: Text(
-                          '${Utils.toInt(date.day)}',
-                          textAlign: TextAlign.left,
-                          style: TextStyle(
-                            fontSize: Utils.parseSize(context, 10.0),
-                            color: DateFormat.yMMMd().format(date) ==  DateFormat.yMMMd().format(_today) ? Colors.white : Colors.black87 ,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                  Spacer(flex: 3,)
-                ],
-              ),
-            ),
+            dayText(date),// 日付
             //クリック時選択表示する。
-            TextButton(
-              child: Container(),
-              onPressed: () async {
-                if(selectDay == date) {
-                  // await Navigator.of(context).push(
-                  //   MaterialPageRoute(
-                  //     builder: (context) {
-                  //       return EditForm(selectDay: selectDay,inputMode: InputMode.create);
-                  //     },
-                  //   ),
-                  // );
-                  // updateListViewCategory();
-                  // dataUpdate();
-                  // reviewCount();
-                  // setState((){});
-                }else{
-                  ref.read(selectDayProvider.notifier).state = date;
-                  // setState((){});
-                }
-              },
-            ),
           ],
         ),
       );
@@ -114,47 +69,75 @@ class DaySquareState extends ConsumerState<DaySquare> {
     }
   }
 
-  //１日のマスの中身
-  List<Widget> squareValue(DateTime date) {
-    final resultWeekList = <Widget>[Expanded(flex: 1, child: Container())];
-    for(var i =0; i < 2; i++) {
-      resultWeekList.add(
-        Expanded(
-            flex: 1,
-            child: Align(
-                alignment: Alignment.centerRight,
-                child: Text(
-                  moneyOfDay(i,date),
-                  style: TextStyle(
-                    color: i == 0 ? App.plusColor : App.minusColor ,
-                    fontSize: 10,
-                  ),
-                  maxLines: 1,
-                )
-            )
-        ),
-      );
-    }
-    return resultWeekList;
+  Widget squareValue(date) {
+    return FutureBuilder(
+        future: DatabaseHelper().sumPriceOfDay(date), // Future<T> 型を返す非同期処理
+        builder: (BuildContext context, AsyncSnapshot<dynamic> snapshot) {
+          if (snapshot.hasData) {
+            var  dish = snapshot.data;
+            return InkWell(
+              child: Column(children: [
+                const Spacer(flex: 1),
+                Container(
+                    alignment: Alignment.centerRight,
+                    child: Text(
+                        '${Utils.formatNumber(dish[0]['price'] ?? 0)}円',
+                        style: TextStyle(fontSize: 12,),
+                        maxLines: 1,
+                    ),
+                ),
+              ],),
+              onTap: () async {
+                  if(selectDay == date) {
+                    // await Navigator.of(context).push(
+                    //   MaterialPageRoute(
+                    //     builder: (context) {
+                    //       return EditForm(selectDay: selectDay,inputMode: InputMode.create);
+                    //     },
+                    //   ),
+                    // );
+                    // updateListViewCategory();
+                    // dataUpdate();
+                    // reviewCount();
+                    // setState((){});
+                  }else{
+                    ref.read(selectDayProvider.notifier).state = date;
+                  }
+              },
+            );
+          } else {
+            return Container();
+          }
+        });
   }
 
-  //カレンダー表示している日の合計
-  String moneyOfDay(int _index, DateTime date) {
-
-    return date.toString();
-
-    // double _plusMoney = 0;
-    // double _minusMoney = 0;
-    // for (var index = 0; index < calendarList.length; index++) {
-    //   if (DateFormat.yMMMd().format(calendarList[index].date) == DateFormat.yMMMd().format(date)) {
-    //     if (calendarList[index].money > 0) {
-    //       _plusMoney += calendarList[index].money;
-    //     } else {
-    //       _minusMoney += calendarList[index].money;
-    //     }
-    //   }
-    // }
-    // return   '${Utils.commaSeparated(_index == 0 ? _plusMoney : _minusMoney*(-1) )}${SharedPrefs.getUnit()}';
+  Widget dayText(date) {
+    return             Padding(
+      padding: const EdgeInsets.all(2.0),
+      child: Row(
+        // crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Expanded(
+            flex: 2,
+            child: Container(
+              height: 46/3,
+              color: DateFormat.yMMMd().format(date) == DateFormat.yMMMd().format(_today) ? Colors.red[300] : Colors.transparent ,
+              child: Center(
+                child: Text(
+                  '${Utils.toInt(date.day)}',
+                  textAlign: TextAlign.left,
+                  style: TextStyle(
+                    fontSize: Utils.parseSize(context, 10.0),
+                    color: DateFormat.yMMMd().format(date) ==  DateFormat.yMMMd().format(_today) ? Colors.white : Colors.black87 ,
+                  ),
+                ),
+              ),
+            ),
+          ),
+          Spacer(flex: 3,)
+        ],
+      ),
+    );
   }
 
   //iとjから日程のデータを出す（Date型）

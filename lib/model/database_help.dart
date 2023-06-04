@@ -166,6 +166,22 @@ class DatabaseHelper {
     return result;
   }
 
+  /*
+  * 【SELECT】 その日の合計値
+  * 使用済の料理の合計値
+   */
+  Future<List> sumPriceOfDay(DateTime _date) async {
+    String date = DateFormat('yyyy-MM-dd').format(_date);
+    final result = await database.rawQuery(
+        '''
+        SELECT sum(price) AS price FROM used_foods
+        WHERE created_at LIKE '$date%'
+      '''
+    );
+    return result;
+  }
+
+
   Future<void> updateStorage(FoodStorage storage) async {
     database.transaction((txn) async {
       await txn.update(storageTable, storage.toMap(), where: '$colId = ?', whereArgs: [storage.id]);

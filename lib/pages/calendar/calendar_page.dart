@@ -219,24 +219,7 @@ class CalendarPageState extends ConsumerState<CalendarPage> {
           } else {
             return const CircularProgressIndicator();
           }
-        });
-  }
-
-//カレンダー表示している日の合計
-  String moneyOfDay(int _index, DateTime date) {
-    return '調整前';
-    // double _plusMoney = 0;
-    // double _minusMoney = 0;
-    // for (var index = 0; index < calendarList.length; index++) {
-    //   if (DateFormat.yMMMd().format(calendarList[index].date) == DateFormat.yMMMd().format(date)) {
-    //     if (calendarList[index].money > 0) {
-    //       _plusMoney += calendarList[index].money;
-    //     } else {
-    //       _minusMoney += calendarList[index].money;
-    //     }
-    //   }
-    // }
-    // return   '${Utils.commaSeparated(_index == 0 ? _plusMoney : _minusMoney*(-1) )}${SharedPrefs.getUnit()}';
+      });
   }
 
 //iとjから日程のデータを出す（Date型）
