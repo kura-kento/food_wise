@@ -38,12 +38,6 @@ class _SettingPageState extends State<SettingPage> {
 
     return Column(
       children: [
-        // Align(
-        //   alignment: Alignment.topCenter,
-        //   child: SharedPrefs.getAdPositionTop()
-        //       ? AdMob.adContainer(myBanner)
-        //       : Container(),
-        // ),
         Expanded(
           child: Scaffold(
               body: GestureDetector(
@@ -212,10 +206,7 @@ class _SettingPageState extends State<SettingPage> {
                   ),
                 ),
           ),
-        ),
-        // SharedPrefs.getAdPositionTop()
-        //     ? Container()
-        //     : AdMob.adContainer(myBanner2),
+        )
       ],
     );
   }

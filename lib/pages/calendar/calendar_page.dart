@@ -11,7 +11,9 @@ import '../../common/app.dart';
 import '../../common/shared_prefs.dart';
 import '../../common/utils.dart';
 import '../../model/database_help.dart';
+import '../input/input.dart';
 import 'Widget/daySquare.dart';
+import 'Widget/form.dart';
 import 'Widget/week.dart';
 import 'package:intl/intl.dart';
 
@@ -116,16 +118,14 @@ class CalendarPageState extends ConsumerState<CalendarPage> {
                       title: 'タイトル',
                       rightButton: IconButton(
                         onPressed: () async {
-                          // await Navigator.of(context).push(
-                          //   MaterialPageRoute(
-                          //     builder: (context) {
-                          //       return EditForm(selectDay: selectDay,inputMode: InputMode.create);
-                          //     },
-                          //   ),
-                          // );
-                          // updateListViewCategory();
-                          // dataUpdate();
-                          // reviewCount();
+                          await Navigator.of(context).push(
+                            MaterialPageRoute(
+                              builder: (context) {
+                                return DishForm();
+                              },
+                            ),
+                          );
+                          setState(() {});
                         },
                         icon: const Icon(Icons.add, color: Colors.white,),
                       ),
@@ -195,24 +195,44 @@ class CalendarPageState extends ConsumerState<CalendarPage> {
               child: ListView.builder(
                 itemCount: dish.length,
                 itemBuilder: (itemBuilder, index) {
-                  return InkWell(
-                    child: Container(
-                      height: 40,
-                      decoration: const BoxDecoration(
-                        border: Border(bottom: BorderSide(width: 1, color: Colors.black26),),),
-                      child: Slidable(
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: <Widget>[
-                            Text(dish[index]['dish_name']),
-                            Text('${Utils.formatNumber(dish[index]['sum_price'])}円'),
-                          ],
+                  return Slidable(
+                    endActionPane:  ActionPane(
+                      extentRatio: 1/5,
+                      motion: const ScrollMotion(),
+                      children: [
+                        SlidableAction(
+                          onPressed: (_) {
+                            dishDelete(dish[index]['id']);
+                          },
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          icon: Icons.delete,
                         ),
-                      ),
+                      ],
                     ),
-                    onTap: () async {
-
-                    },
+                    child: InkWell(
+                      child: Container(
+                          height: 40,
+                          decoration: const BoxDecoration(
+                            border: Border(bottom: BorderSide(width: 1, color: Colors.black26),),),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: <Widget>[
+                              Text(dish[index]['dish_name']),
+                              Text('${Utils.formatNumber(dish[index]['sum_price'] ?? 0)}円'),
+                            ],
+                          ),
+                      ),
+                      onTap: () async {
+                        await Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) {
+                              return DishForm(dishId: dish[index]['dish_id']);
+                            },
+                          ),
+                        );
+                      },
+                    ),
                   );
               }),
             );
@@ -220,6 +240,11 @@ class CalendarPageState extends ConsumerState<CalendarPage> {
             return const CircularProgressIndicator();
           }
       });
+  }
+
+  Future<void> dishDelete(id) async {
+    DatabaseHelper().deleteDish(id);
+    setState(() {});
   }
 
 //iとjから日程のデータを出す（Date型）

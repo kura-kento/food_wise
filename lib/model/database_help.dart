@@ -89,7 +89,8 @@ class DatabaseHelper {
   // 全て取得
   Future<List<FoodStorage>> getFoodStorage() async {
     final result = await database.query(storageTable, orderBy: '$colCreatedAt DESC');
-    // debugPrint(result.toString());
+    // final result2 = await database.query(usedFoodTable, orderBy: '$colCreatedAt DESC');
+    // debugPrint(result2.toString());
     return result.map((Map<String, dynamic> food) => FoodStorage.fromMapObject(food)).toList();
   }
 
@@ -97,8 +98,7 @@ class DatabaseHelper {
   * 【INSERT】 食糧庫 リストを全て登録
    */
   Future<void> insertStorage(List<FoodStorage> foodStorages) async {
-    // await DatabaseHelper().insertStorage(card);
-    database.transaction((txn) async {
+    // database.transaction((txn) async {
       foodStorages.forEach((foodStorage) async {
         final storage = FoodStorage(
           null,
@@ -111,23 +111,22 @@ class DatabaseHelper {
           DateTime.now(),
           null
         );
-        await txn.insert(storageTable, storage.toMap());
+        await database.insert(storageTable, storage.toMap());
       });
-    });
+    // });
   }
 
   /*
   * 【INSERT】 使用した食糧 リストを全て登録
    */
-  Future<void> insertUseFoods(List<FoodStorage> foodStorages,String dishName) async {
-    // await DatabaseHelper().insertStorage(card);
-    database.transaction((txn) async {
+  Future<void> insertUseFoods(date, String dishName, List<FoodStorage> foodStorages) async {
+    // database.transaction((txn) async {
       // 料理名
-      Dish dish = Dish(null, dishName, false, '', 1, DateTime.now(), null);
-      int dishId = await txn.insert(usedFoodTable, dish.toMap());
+      Dish dish = Dish(null, dishName, false, '', 1, date, null);
+      int dishId = await database.insert(dishTable, dish.toMap());
 
       foodStorages.forEach((foodStorage) async {
-        UsedFood usedFood = UsedFood(
+        final usedFood = UsedFood(
           null,
           dishId, // 料理ID
           foodStorage.id, // 食糧庫ID
@@ -137,12 +136,40 @@ class DatabaseHelper {
           foodStorage.price, //金額
           null,
           1,
-          DateTime.now(),
+          date,
           null
         );
-        await txn.insert(usedFoodTable, usedFood.toMap());
+        await database.insert(usedFoodTable, usedFood.toMap());
       });
-    });
+    // });
+  }
+
+  /*
+  * 【SELECT】 選択　料理名と使用済食材リスト
+   */
+  Future<List> getUsedFood(dish_id) async {
+    // String date = DateFormat('yyyy-MM-dd').format(_date);
+    final result = await database.rawQuery(
+        '''
+        SELECT * FROM used_foods
+        WHERE used_foods.dish_id LIKE '$dish_id%'
+      '''
+    );
+    return result;
+  }
+
+  /*
+  * 【SELECT】 選択　料理名と使用済食材リスト
+   */
+  Future<List> getDish(dish_id) async {
+    // String date = DateFormat('yyyy-MM-dd').format(_date);
+    final result = await database.rawQuery(
+        '''
+        SELECT * FROM dishes
+        WHERE dishes.id LIKE '$dish_id%'
+      '''
+    );
+    return result;
   }
 
   /*
@@ -179,6 +206,16 @@ class DatabaseHelper {
       '''
     );
     return result;
+  }
+
+  /*
+  * 【DELETE】 IDに紐付くリストを削除する
+   */
+  Future<void> deleteDish(int id) async {
+    database.transaction((txn) async {
+      await txn.rawDelete('DELETE FROM $dishTable WHERE $colId = $id');
+      await txn.rawDelete('DELETE FROM $usedFoodTable WHERE $dishId = $id');
+    });
   }
 
 

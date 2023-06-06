@@ -9,8 +9,12 @@ import '../../../model/database_help.dart';
 import '../../../widget/FoodForm.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../calendar_page.dart';
+
 class DishForm extends ConsumerStatefulWidget {
-  const DishForm({Key? key}) : super(key: key);
+  const DishForm({Key? key, this.dishId}) : super(key: key);
+
+  final dishId;
 
   @override
   DishFormState createState() => DishFormState();
@@ -26,10 +30,15 @@ class DishFormState extends ConsumerState<DishForm> {
   List<FoodStorage> foodStorages = [];
   double sumPrice = 0;
   late var insertFoodStorages;
+  late DateTime selectDay;
 
   @override
   void initState() {
     selectStorage();
+    if(widget.dishId != null) {
+      var usedFood = DatabaseHelper().getUsedFood(widget.dishId);
+      var dish = DatabaseHelper().getDish(widget.dishId);
+    }
     super.initState();
   }
 
@@ -40,6 +49,7 @@ class DishFormState extends ConsumerState<DishForm> {
 
   @override
   Widget build(BuildContext context) {
+    selectDay = ref.watch(selectDayProvider);
     insertFoodStorages = ref.watch(insertFoodStoragesProvider);
 
     return SafeArea(
@@ -75,12 +85,15 @@ class DishFormState extends ConsumerState<DishForm> {
           icon: Icon(Icons.arrow_back_ios, color: App.btn_color),
           onPressed: () { Navigator.of(context).pop(); },
         ),
-        rightButton: const Text('保存', style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold,),),
-        onTap:() {
-          _save();
-          Navigator.pop(context);
-          setState(() {});
-        }
+        rightButton: IconButton(
+          icon: Icon(Icons.save_as, color: App.btn_color),
+          onPressed: () {
+            print("保存");
+            _save();
+            // Navigator.pop(context);
+            setState(() {});
+          },
+        ),
     );
   }
 
@@ -165,13 +178,14 @@ class DishFormState extends ConsumerState<DishForm> {
         ),
       );
     } else {
-      await DatabaseHelper().insertStorage(insertFoodStorages);
+      await DatabaseHelper().insertUseFoods(selectDay, dishController.text, insertFoodStorages);
       insertFoodStorages.clear();
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
           content: Text('保存に成功しました。'),
         ),
       );
+      Navigator.of(context).pop;
     }
   }
 }

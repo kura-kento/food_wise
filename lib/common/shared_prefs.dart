@@ -60,4 +60,9 @@ class SharedPrefs {
   static const textColor = 'textColor';
   static Future<bool>? setTextColor(String value) => _sharedPreferences?.setString(textColor, value);
   static String getTextColor() => _sharedPreferences?.getString(textColor) ?? '0xDD000000';
+
+  //【共通】リワード時間
+  static const isZeroHidden = 'isZeroHidden';
+  static Future<bool>? setIsZeroHidden(bool value) => _sharedPreferences?.setBool(isZeroHidden, value);
+  static bool getIsZeroHidden() => _sharedPreferences?.getBool(isZeroHidden) ?? false;
 }

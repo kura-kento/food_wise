@@ -30,7 +30,6 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
     // MemoHome(),
     CalendarPage(),
     InputForm(),
-    DishForm(),
 
     // const CardList(),
     // CalendarPage(),
@@ -139,9 +138,7 @@ class _HomePageState extends State<HomePage> with WidgetsBindingObserver {
                         BottomNavigationBarItem(
                             icon: Icon(Icons.settings), label: '設定'),
                         BottomNavigationBarItem(
-                            icon: Icon(Icons.settings), label: '設定'),
-                        BottomNavigationBarItem(
-                            icon: Icon(Icons.settings), label: '設定'),
+                            icon: Icon(Icons.settings), label: '設定')
                       ],
                       iconSize: 20.0,
                       selectedFontSize: 10.0,

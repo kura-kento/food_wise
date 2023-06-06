@@ -232,8 +232,7 @@ class FoodFormWidgetState extends ConsumerState<FoodFormWidget> {
     if (selectUnitKind == null) {
       return Container();
     }
-
-    print('③量の表示' + selectUnitKind.toString());
+    // print('③量の表示' + selectUnitKind.toString());
 
     List? tags = UnitMap.volumeMap[selectUnitKind?.name] ?? [];
 
@@ -341,11 +340,15 @@ class FoodFormWidgetState extends ConsumerState<FoodFormWidget> {
       icon: const Icon(Icons.add, color: Colors.pink,size: 30),
       onPressed: () {
         // 金額
+        //TODO 金額手入力
         double price = 0;
+        // 食糧庫に登録　か　料理作成
         if(widget.isFoodStorages) {
           price = double.parse(priceController.text);
+          // price = (selectedFood?.price ?? 0) / (selectedFood?.quantity ?? 0) * double.parse(volumeController.text); // 購入価格 / 全体数量 * 使用数量
         } else {
           price = (selectedFood?.price ?? 0) / (selectedFood?.quantity ?? 0) * double.parse(volumeController.text); // 購入価格 / 全体数量 * 使用数量
+          // price = double.parse(priceController.text);
         }
 
         insertFoodStorages.add(
@@ -363,7 +366,7 @@ class FoodFormWidgetState extends ConsumerState<FoodFormWidget> {
         );
         // init();
         selectClear(clearAll: true);
-        // priceSum();
+        priceSum();
         setState(() {});
       },
     );

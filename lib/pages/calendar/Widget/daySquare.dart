@@ -6,6 +6,7 @@ import '../../../common/app.dart';
 import '../../../common/utils.dart';
 import '../../../model/database_help.dart';
 import '../calendar_page.dart';
+import 'form.dart';
 
 
 class DaySquare extends ConsumerStatefulWidget {
@@ -89,17 +90,14 @@ class DaySquareState extends ConsumerState<DaySquare> {
               ],),
               onTap: () async {
                   if(selectDay == date) {
-                    // await Navigator.of(context).push(
-                    //   MaterialPageRoute(
-                    //     builder: (context) {
-                    //       return EditForm(selectDay: selectDay,inputMode: InputMode.create);
-                    //     },
-                    //   ),
-                    // );
-                    // updateListViewCategory();
-                    // dataUpdate();
-                    // reviewCount();
-                    // setState((){});
+                    await Navigator.of(context).push(
+                      MaterialPageRoute(
+                        builder: (context) {
+                          return DishForm();
+                        },
+                      ),
+                    );
+                    setState((){});
                   }else{
                     ref.read(selectDayProvider.notifier).state = date;
                   }

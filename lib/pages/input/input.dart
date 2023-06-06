@@ -43,7 +43,7 @@ class InputFormState extends ConsumerState<InputForm> {
             title: '',
             // leftButton:
             rightButton:  IconButton(
-              icon: const Icon(Icons.save_as, color: Colors.white,size: 30),
+              icon: const Icon(Icons.save_as, color: Colors.white, size: 30),
               onPressed: () {
                 _save();
                 setState(() {});
@@ -85,3 +85,4 @@ class InputFormState extends ConsumerState<InputForm> {
     return [{}];
   }
 }
+
